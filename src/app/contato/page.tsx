@@ -7,7 +7,7 @@ import SiteImage from "@/components/SiteImage";
 export const metadata: Metadata = {
   title: "Contato | Safe Works",
   description:
-    "Fale com o Complexo Safe Works em Mossoró/RN: WhatsApp, Instagram @safe.works e formulário de contato.",
+    "Fale com o Complexo Safe Works em Mossoró/RN: WhatsApp, Instagram @cswairsoft e formulário de contato.",
 };
 
 export default function ContatoPage() {
@@ -29,8 +29,8 @@ export default function ContatoPage() {
                 Mossoró / RN
               </h2>
               <p className="mt-2 text-sm text-ink-soft max-w-sm">
-                Endereço completo e ponto de referência informados na confirmação
-                de partida ou visita — fale com a gente para chegar certo.
+                R. Tancredo de Almeida Neves - Dom Jaime Câmara, Mossoró - RN,
+                59628-340.
               </p>
             </div>
 
@@ -53,12 +53,12 @@ export default function ContatoPage() {
             <div className="border-t border-line pt-6">
               <p className="eyebrow">Instagram</p>
               <a
-                href="https://instagram.com/safe.works"
+                href="https://instagram.com/cswairsoft"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 inline-block font-display text-xl font-semibold text-ink hover:text-accent"
               >
-                @safe.works
+                @cswairsoft
               </a>
               <p className="mt-2 text-sm text-ink-soft max-w-sm">
                 Bastidores do campo, oficina, loja e treinamentos, além de avisos

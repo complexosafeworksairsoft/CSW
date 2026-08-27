@@ -5,21 +5,21 @@ const PILLARS = [
   {
     tag: "campo",
     title: "Campo de Jogo",
-    desc: "Partidas e operações de airsoft em terreno preparado, com regras claras de segurança.",
+    desc: "Jogos de airsoft em ambiente preparado, com regras claras de segurança.",
     href: "/campo",
     photo: "Foto: campo de jogo",
     slotKey: "home.pillar.campo",
   },
   {
-    tag: "oficina",
+    tag: "reparos",
     title: "Oficina",
-    desc: "Manutenção e customização de réplicas, com equipe técnica própria.",
+    desc: "Manutenção e customização de AEG, com equipe técnica especializada.",
     href: "/oficina",
     photo: "Foto: bancada da oficina",
     slotKey: "home.pillar.oficina",
   },
   {
-    tag: "loja",
+    tag: "equipamentos",
     title: "Loja",
     desc: "Equipamentos, proteção e acessórios táticos para jogar com segurança.",
     href: "/loja",
@@ -29,7 +29,7 @@ const PILLARS = [
   {
     tag: "treinamentos",
     title: "Treinamentos Táticos",
-    desc: "Treinamento de técnica, segurança e tática para todos os níveis.",
+    desc: "Táticas, técnicas eficientes, segurança e exercícios práticos para todos os níveis.",
     href: "/treinamentos",
     photo: "Foto: treinamentos táticos",
     slotKey: "home.pillar.treinamentos",
@@ -58,8 +58,9 @@ export default function Home() {
               Complexo Safe Works
             </h1>
             <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-              Campo, oficina, loja e treinamentos táticos de airsoft reunidos em um
-              único endereço. Jogue, aprenda e equipe-se em segurança.
+              Campo de Jogo, oficina mecânica, equipamentos e treinamentos táticos
+              de airsoft reunidos em um único endereço. Jogue, aprenda e
+              equipe-se em segurança.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

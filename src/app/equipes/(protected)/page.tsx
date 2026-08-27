@@ -36,7 +36,7 @@ export default async function EquipesDashboardPage() {
         Bem-vindo, {team.teamName}
       </h1>
       <p className="mt-3 max-w-xl text-ink-soft">
-        Acompanhe as próximas operações do Complexo, confirme presença e
+        Acompanhe as próximas operações da região, confirme presença e
         consulte briefings e comunicados exclusivos da sua equipe.
       </p>
 

@@ -21,22 +21,22 @@ const SERVICOS = [
   {
     tag: "manutenção",
     title: "Manutenção preventiva",
-    desc: "Limpeza interna, lubrificação, revisão de gaxetas e verificação geral para manter a réplica funcionando de forma consistente e segura.",
+    desc: "Limpeza interna, lubrificação, ajuste de engrenagens, polimentos e verificação geral para manter o equipamento em pleno funcionamento de forma consistente e segura.",
   },
   {
     tag: "reparo",
     title: "Reparo e diagnóstico",
-    desc: "Identificação de falhas de disparo, perda de potência, travamentos e problemas elétricos ou pneumáticos, com conserto da causa raiz.",
+    desc: "Identificação de falhas, perda de potência, problemas elétricos ou pneumáticos, com conserto da causa raiz sem paliativos.",
   },
   {
     tag: "upgrade",
     title: "Upgrade interno",
-    desc: "Troca de gearbox, motor, hop-up, cano interno e outros componentes para ganho de precisão, consistência ou potência dentro do limite permitido em campo.",
+    desc: "Gearbox, motor, hop-up, cano interno e outros componentes para ganho de precisão, consistência e potência.",
   },
   {
     tag: "customização",
     title: "Customização externa",
-    desc: "Pintura, camuflagem, acessórios táticos (trilhos, grip, coronha) e ajustes estéticos para deixar a réplica com a cara do operador.",
+    desc: "Pintura, camuflagem, acessórios táticos (trilhos, grip, coronha) e ajustes estéticos para deixar a sua AEG com a cara do operador.",
   },
 ];
 
@@ -64,7 +64,7 @@ const ETAPAS = [
   {
     n: "05",
     title: "Retirada",
-    desc: "Réplica testada e pronta para voltar a campo, com explicação do que foi feito.",
+    desc: "Réplica testada e pronta para voltar a campo, com explicação do que foi feito, sempre prezando a transparência com o cliente.",
   },
 ];
 
@@ -73,14 +73,14 @@ export default function OficinaPage() {
     <>
       <Hero
         eyebrow="Oficina"
-        title="Sua réplica nas mãos de quem entende o mecanismo"
-        subtitle="Manutenção, reparo e customização de réplicas de airsoft, com equipe técnica própria e diagnóstico antes de qualquer serviço."
+        title="Sua AEG nas mãos de quem entende"
+        subtitle="Manutenção, reparo e customização de réplicas de airsoft, com equipe técnica própria com know-how."
         actions={
           <Link
             href="/contato"
             className="bg-accent text-[#231400] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
           >
-            Levar minha réplica
+            Levar minha AEG
           </Link>
         }
         image={<SiteImage slotKey="oficina.hero" label="Foto: bancada da oficina" ratio="portrait" />}
@@ -93,7 +93,7 @@ export default function OficinaPage() {
         </h2>
         <p className="mt-3 max-w-2xl text-ink-soft">
           Da limpeza básica ao upgrade interno completo, o objetivo é sempre o
-          mesmo: uma réplica que dispara de forma consistente e segura, dentro dos
+          mesmo: uma AEG que dispara de forma consistente e segura, dentro dos
           limites de potência praticados em campo.
         </p>
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2">
@@ -152,10 +152,12 @@ export default function OficinaPage() {
           </h2>
           <div className="mt-6 max-w-2xl flex items-start justify-between gap-4 bg-surface-2 border border-line p-6 rounded-sm">
             <p className="text-ink-soft">
-              Cada réplica chega com um histórico e um problema diferentes, então o
-              valor do serviço é definido depois do diagnóstico técnico — nunca
-              antes. A tabela de preços de serviços mais comuns (limpeza, revisão,
-              troca de peças de desgaste) está em definição.
+              <span className="font-semibold text-ink">A partir de R$ 150</span> —
+              valor final definido após o diagnóstico técnico. Cada réplica chega
+              com um histórico e um problema diferentes, então o valor do
+              serviço nunca é fechado antes disso. A tabela de preços de
+              serviços mais comuns (limpeza, lubrificação e ajustes) está em
+              definição.
             </p>
             <Confirmar />
           </div>

@@ -7,9 +7,9 @@ import PhotoTile from "@/components/PhotoTile";
 
 const LINKS = [
   { href: "/", label: "Início" },
-  { href: "/o-complexo", label: "O Complexo" },
+  { href: "/o-complexo", label: "Complexo Safe Works" },
   { href: "/campo", label: "Campo de Jogo" },
-  { href: "/oficina", label: "Oficina" },
+  { href: "/oficina", label: "Oficina Mecânica" },
   { href: "/loja", label: "Loja" },
   { href: "/treinamentos", label: "Treinamentos Táticos" },
   { href: "/regras", label: "Central de Regras" },

@@ -9,14 +9,6 @@ export const metadata: Metadata = {
     "Equipamento obrigatório, regras de segurança e conduta em campo, o que levar e perguntas frequentes sobre airsoft no Complexo Safe Works.",
 };
 
-function Confirmar() {
-  return (
-    <span className="inline-flex items-center gap-1.5 bg-accent/10 text-accent border border-accent px-2.5 py-1 rounded-sm font-mono-safe text-xs uppercase tracking-widest whitespace-nowrap">
-      A confirmar
-    </span>
-  );
-}
-
 const EQUIPAMENTO = [
   {
     title: "Óculos de proteção balística",
@@ -33,28 +25,26 @@ const EQUIPAMENTO = [
   },
   {
     title: "Réplica dentro do limite de potência",
-    desc: "Toda réplica passa por teste de cronógrafo antes de entrar em campo. Limite de potência praticado:",
-    confirmar: true,
+    desc: "Toda réplica passa por teste de cronógrafo antes de entrar em campo. Limite de potência praticado: 330 fps / 0,20g ou 1 joule.",
   },
 ];
 
 const CONDUTA = [
   {
-    title: "Distância mínima de engajamento (MED)",
-    desc: "Regra que define a distância mínima para atirar em um alvo, reduzindo o impacto do disparo em curta distância. Valor aplicado no Complexo:",
-    confirmar: true,
+    title: "Distância mínima de engajamento",
+    desc: "Regra que define a distância mínima para atirar em um alvo, reduzindo o impacto do disparo em curta distância. Valor aplicado no Complexo: zero metros.",
   },
   {
     title: "Chamar o acerto",
-    desc: "Quem é atingido declara o acerto em voz alta (\"acertei\") e sai de jogo imediatamente, levantando a arma ou sinalizando conforme orientado no briefing.",
+    desc: "Quem é atingido declara o acerto em voz alta (\"Morto\") e sai de jogo imediatamente, levantando a mão/arma ou sinalizando conforme orientado no briefing.",
   },
   {
-    title: "Cessar-fogo",
-    desc: "Ao ouvir \"cessar-fogo\", todo mundo para de atirar e se movimenta imediatamente na área, até a arbitragem liberar a continuidade.",
+    title: "Jogo",
+    desc: "A partida começa com um apito longo, e encerra com três apitos curtos.",
   },
   {
-    title: "Trava e cano coberto fora de jogo",
-    desc: "Em zona segura e fora de partida, a réplica permanece travada e com o cano coberto ou apontado para o chão.",
+    title: "Safe e tiro seco",
+    desc: "Em zona segura (Safe Zone), a AEG deve permanecer travada e sem bolinha no cano/hop up.",
   },
   {
     title: "Autoridade da arbitragem",
@@ -62,23 +52,21 @@ const CONDUTA = [
   },
   {
     title: "Zero tolerância a conduta insegura",
-    desc: "Mirar de forma proposital em quem já saiu de jogo, remover proteção em área de jogo ou desrespeitar a arbitragem resulta em remoção da partida.",
+    desc: "Mirar de forma proposital em quem já saiu de jogo, tiro cego, tiro por fresta, e disparos no modo Full ou desrespeitar a arbitragem resulta em remoção da partida.",
   },
 ];
 
 const LEVAR = [
   "Documento de identificação",
-  "Roupa apropriada para terreno externo (manga comprida recomendada)",
-  "Água e hidratação para o dia todo de jogo",
-  "Óculos de proteção balística, se já tiver o próprio",
-  "Protetor solar e boné/chapéu para os intervalos",
-  "Muda de roupa, se pretender ficar até o fim do dia",
+  "Roupa apropriada (manga comprida e calça é recomendado)",
+  "Óculos de proteção, se já tiver o próprio",
+  "Calçado fechado é obrigatório",
 ];
 
 const FAQ = [
   {
     q: "Airsoft dói?",
-    a: "Um acerto de BB pode causar uma ferroada momentânea, comparável a uma beliscada forte, principalmente em pele exposta. Com o equipamento de proteção correto e roupas adequadas, o desconforto é mínimo — e é exatamente por isso que o equipamento é obrigatório.",
+    a: "Um acerto de BB pode causar uma ferroada momentânea, comparável a uma beliscada forte, principalmente em pele exposta. Com o equipamento de proteção correto e roupas adequadas, o desconforto é razoável — e é exatamente por isso que o equipamento é obrigatório.",
   },
   {
     q: "Preciso ter equipamento próprio para jogar?",
@@ -86,8 +74,7 @@ const FAQ = [
   },
   {
     q: "Qual a idade mínima para jogar?",
-    a: "A idade mínima e as condições para menores de idade (como autorização de responsável) ainda serão publicadas nesta página.",
-    confirmar: true,
+    a: "A idade mínima é 18 anos. As condições para menores de idade (como autorização de responsável) ainda podem ser avaliadas a depender de cada indivíduo.",
   },
   {
     q: "Preciso de experiência prévia?",
@@ -95,12 +82,11 @@ const FAQ = [
   },
   {
     q: "O que acontece se eu for atingido?",
-    a: "Você declara o acerto, sai de jogo imediatamente e se dirige à área segura combinada no briefing, sem continuar participando da rodada em andamento.",
+    a: "Você declara \"morto\", sai de jogo imediatamente e se dirige à área segura combinada no briefing, sem continuar participando da rodada em andamento.",
   },
   {
     q: "Posso levar meu celular ou câmera para dentro do campo?",
-    a: "Normas específicas sobre uso de celular, câmeras e redes sociais durante a partida ainda serão publicadas nesta página.",
-    confirmar: true,
+    a: "Sim, mas recomendamos não utilizar na partida — o risco de danificar é por conta do proprietário. O mesmo vale para relógios e acessórios.",
   },
   {
     q: "Existe alguma condição de saúde que impede jogar?",
@@ -130,12 +116,9 @@ export default function RegrasPage() {
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2">
           {EQUIPAMENTO.map((item) => (
             <div key={item.title} className="bg-surface p-6">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="font-display text-lg font-semibold text-ink">
-                  {item.title}
-                </h3>
-                {item.confirmar && <Confirmar />}
-              </div>
+              <h3 className="font-display text-lg font-semibold text-ink">
+                {item.title}
+              </h3>
               <p className="mt-2 text-sm text-ink-soft">{item.desc}</p>
               {item.critico && (
                 <p className="mt-3 font-mono-safe text-xs uppercase tracking-widest text-accent">
@@ -154,19 +137,14 @@ export default function RegrasPage() {
             Segurança e conduta em campo
           </h2>
           <p className="mt-3 max-w-2xl text-ink-soft">
-            Estas regras se aplicam a toda partida realizada no Complexo. Alguns
-            valores específicos ainda estão em confirmação e serão publicados
-            aqui assim que definidos.
+            Estas regras se aplicam a toda partida realizada no Complexo.
           </p>
           <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2">
             {CONDUTA.map((item) => (
               <div key={item.title} className="bg-surface p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-display text-lg font-semibold text-ink">
-                    {item.title}
-                  </h3>
-                  {item.confirmar && <Confirmar />}
-                </div>
+                <h3 className="font-display text-lg font-semibold text-ink">
+                  {item.title}
+                </h3>
                 <p className="mt-2 text-sm text-ink-soft">{item.desc}</p>
               </div>
             ))}
@@ -220,12 +198,9 @@ export default function RegrasPage() {
           <div className="mt-8 grid gap-px bg-line border border-line">
             {FAQ.map((item) => (
               <div key={item.q} className="bg-surface p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-display text-lg font-semibold text-ink">
-                    {item.q}
-                  </h3>
-                  {item.confirmar && <Confirmar />}
-                </div>
+                <h3 className="font-display text-lg font-semibold text-ink">
+                  {item.q}
+                </h3>
                 <p className="mt-2 text-sm text-ink-soft max-w-3xl">{item.a}</p>
               </div>
             ))}

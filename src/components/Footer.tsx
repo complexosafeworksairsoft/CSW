@@ -14,7 +14,7 @@ export default function Footer() {
         <div>
           <p className="eyebrow">Complexo</p>
           <ul className="mt-3 flex flex-col gap-2 text-sm text-ink-soft">
-            <li><Link href="/o-complexo" className="hover:text-olive-deep">O Complexo</Link></li>
+            <li><Link href="/o-complexo" className="hover:text-olive-deep">Complexo Safe Works</Link></li>
             <li><Link href="/campo" className="hover:text-olive-deep">Campo de Jogo</Link></li>
             <li><Link href="/oficina" className="hover:text-olive-deep">Oficina</Link></li>
             <li><Link href="/loja" className="hover:text-olive-deep">Loja</Link></li>

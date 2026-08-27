@@ -6,7 +6,7 @@ import SiteImage from "@/components/SiteImage";
 export const metadata: Metadata = {
   title: "Loja | Safe Works",
   description:
-    "Réplicas, proteção, uniformes e acessórios táticos para jogar airsoft com segurança. Conheça a Loja do Complexo Safe Works.",
+    "AEG, proteção, uniformes e acessórios táticos para jogar com segurança. Conheça a Loja do Complexo Safe Works.",
 };
 
 const CATEGORIAS = [
@@ -55,7 +55,7 @@ export default function LojaPage() {
           Categorias de equipamento
         </h2>
         <p className="mt-3 max-w-2xl text-ink-soft">
-          A curadoria da loja segue a mesma lógica do resto do Complexo: prioridade
+          A nossa equipe segue a mesma lógica do resto do Complexo: prioridade
           para equipamento de proteção, depois para tudo o que melhora a
           experiência de jogo.
         </p>
@@ -92,22 +92,15 @@ export default function LojaPage() {
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="max-w-2xl bg-surface border border-line p-6 rounded-sm">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="eyebrow">Como comprar</p>
-              <h3 className="mt-2 font-display text-xl font-semibold text-ink">
-                Venda presencial ou também online?
-              </h3>
-              <p className="mt-2 text-sm text-ink-soft">
-                Ainda estamos definindo se a loja vai operar apenas no balcão do
-                Complexo ou também com catálogo e vendas pela internet. Por
-                enquanto, considere a compra como presencial — atualizamos esta
-                página assim que a decisão for fechada.
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-1.5 bg-accent/10 text-accent border border-accent px-2.5 py-1 rounded-sm font-mono-safe text-xs uppercase tracking-widest whitespace-nowrap">
-              Em definição
-            </span>
+          <div>
+            <p className="eyebrow">Como comprar</p>
+            <h3 className="mt-2 font-display text-xl font-semibold text-ink">
+              Venda presencial ou também online?
+            </h3>
+            <p className="mt-2 text-sm text-ink-soft">
+              Por enquanto, considere a compra como presencial — conseguimos
+              todos os modelos de equipamento por encomenda.
+            </p>
           </div>
         </div>
         <div className="mt-6">
