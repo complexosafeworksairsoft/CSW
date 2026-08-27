@@ -35,14 +35,14 @@ export default function Nav() {
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden xl:flex items-center gap-0.5">
           {LINKS.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-2 text-sm font-medium tracking-wide transition-colors ${
+                className={`whitespace-nowrap px-2.5 py-2 text-sm font-medium tracking-wide transition-colors ${
                   active
                     ? "text-accent"
                     : "text-[#D8D2B8] hover:text-[#F6F2E4]"
@@ -54,10 +54,10 @@ export default function Nav() {
           })}
         </nav>
 
-        <div className="hidden lg:block">
+        <div className="hidden xl:block">
           <Link
             href="/equipes"
-            className="font-mono-safe text-xs uppercase tracking-widest border border-[#F0EBDB]/35 px-3 py-2 rounded-sm hover:border-accent hover:text-accent transition-colors"
+            className="whitespace-nowrap font-mono-safe text-xs uppercase tracking-widest border border-[#F0EBDB]/35 px-3 py-2 rounded-sm hover:border-accent hover:text-accent transition-colors"
           >
             Portal de Equipes
           </Link>
@@ -68,7 +68,7 @@ export default function Nav() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label="Abrir menu"
-          className="lg:hidden inline-flex flex-col justify-center gap-1.5 p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="xl:hidden inline-flex flex-col justify-center gap-1.5 p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <span className={`block h-0.5 w-6 bg-current transition-transform ${open ? "translate-y-2 rotate-45" : ""}`} />
           <span className={`block h-0.5 w-6 bg-current transition-opacity ${open ? "opacity-0" : ""}`} />

@@ -9,6 +9,7 @@ const PORTAL_LINKS = [
   { href: "/equipes", label: "Painel" },
   { href: "/equipes/agenda", label: "Agenda" },
   { href: "/equipes/conteudo", label: "Conteúdo exclusivo" },
+  { href: "/equipes/ficha", label: "Ficha da Equipe" },
 ];
 
 export default async function EquipesProtectedLayout({

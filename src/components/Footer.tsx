@@ -35,8 +35,8 @@ export default function Footer() {
 
       <div className="border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 font-mono-safe text-xs text-muted flex flex-wrap justify-between gap-2">
-          <span>© {new Date().getFullYear()} Safe Works · Mossoró/RN</span>
-          <span>Complexo de airsoft</span>
+          <span>© {new Date().getFullYear()} Complexo Safe Works · Mossoró/RN</span>
+          <span>Mossoró/RN</span>
         </div>
       </div>
     </footer>
