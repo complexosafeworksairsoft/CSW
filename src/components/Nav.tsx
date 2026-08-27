@@ -21,7 +21,7 @@ export default function Nav() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-olive-deep text-[#F0EBDB]">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 lg:gap-4">
         <Link href="/" className="flex items-center gap-2.5 shrink-0" onClick={() => setOpen(false)}>
           <span
             aria-hidden
@@ -35,14 +35,16 @@ export default function Nav() {
           </span>
         </Link>
 
-        <nav className="hidden xl:flex items-center gap-0.5">
+        <nav
+          className="hidden lg:flex items-center gap-0.5 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {LINKS.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`whitespace-nowrap px-2.5 py-2 text-sm font-medium tracking-wide transition-colors ${
+                className={`whitespace-nowrap px-2 py-2 text-[13px] font-medium tracking-wide transition-colors lg:px-2.5 lg:text-sm ${
                   active
                     ? "text-accent"
                     : "text-[#D8D2B8] hover:text-[#F6F2E4]"
@@ -54,7 +56,7 @@ export default function Nav() {
           })}
         </nav>
 
-        <div className="hidden xl:block">
+        <div className="hidden lg:block shrink-0">
           <Link
             href="/equipes"
             className="whitespace-nowrap font-mono-safe text-xs uppercase tracking-widest border border-[#F0EBDB]/35 px-3 py-2 rounded-sm hover:border-accent hover:text-accent transition-colors"
@@ -68,7 +70,7 @@ export default function Nav() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label="Abrir menu"
-          className="xl:hidden inline-flex flex-col justify-center gap-1.5 p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="lg:hidden inline-flex flex-col justify-center gap-1.5 p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <span className={`block h-0.5 w-6 bg-current transition-transform ${open ? "translate-y-2 rotate-45" : ""}`} />
           <span className={`block h-0.5 w-6 bg-current transition-opacity ${open ? "opacity-0" : ""}`} />
