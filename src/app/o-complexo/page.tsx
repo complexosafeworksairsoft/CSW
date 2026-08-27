@@ -6,7 +6,7 @@ import SiteImage from "@/components/SiteImage";
 export const metadata: Metadata = {
   title: "O Complexo | Safe Works",
   description:
-    "Conheça o Complexo Safe Works: campo de jogo, oficina, loja e escola tática de airsoft reunidos em Mossoró/RN.",
+    "Conheça o Complexo Safe Works: campo de jogo, oficina, loja e treinamentos táticos de airsoft reunidos em Mossoró/RN.",
 };
 
 const OPERACOES = [
@@ -35,12 +35,12 @@ const OPERACOES = [
     slotKey: "o-complexo.operacao.loja",
   },
   {
-    tag: "04 · escola",
-    title: "Escola Tática",
+    tag: "04 · treinamentos",
+    title: "Treinamentos Táticos",
     desc: "Formação de base e evolução técnica. Ensinamos a jogar com segurança antes de ensinar a jogar bem — nessa ordem.",
-    href: "/escola",
-    photo: "Foto: aula da escola tática",
-    slotKey: "o-complexo.operacao.escola",
+    href: "/treinamentos",
+    photo: "Foto: aula de treinamentos táticos",
+    slotKey: "o-complexo.operacao.treinamentos",
   },
 ];
 
@@ -86,8 +86,8 @@ export default function OComplexoPage() {
           <p className="mt-3 max-w-2xl text-ink-soft">
             Cada frente funciona sozinha, mas foi pensada para sustentar as
             outras três. Quem joga no campo encontra suporte na oficina e
-            equipamento na loja; quem passa pela escola chega ao campo já
-            treinado nos fundamentos de segurança.
+            equipamento na loja; quem passa pelos treinamentos táticos chega ao
+            campo já treinado nos fundamentos de segurança.
           </p>
           <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2 lg:grid-cols-4">
             {OPERACOES.map((op) => (

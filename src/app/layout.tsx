@@ -37,7 +37,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Complexo Safe Works | Mossoró/RN",
   description:
-    "Complexo Safe Works: campo de jogo, oficina de manutenção, loja e escola tática de airsoft em Mossoró/RN.",
+    "Complexo Safe Works: campo de jogo, oficina de manutenção, loja e treinamentos táticos de airsoft em Mossoró/RN.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

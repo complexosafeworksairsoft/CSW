@@ -7,7 +7,7 @@ export default function Footer() {
         <div>
           <p className="font-display text-lg font-semibold text-ink">SAFE WORKS</p>
           <p className="mt-2 text-sm text-ink-soft max-w-xs">
-            Campo de jogo, oficina, loja e escola tática de airsoft em Mossoró/RN.
+            Campo de jogo, oficina, loja e treinamentos táticos de airsoft em Mossoró/RN.
           </p>
         </div>
 
@@ -18,7 +18,7 @@ export default function Footer() {
             <li><Link href="/campo" className="hover:text-olive-deep">Campo de Jogo</Link></li>
             <li><Link href="/oficina" className="hover:text-olive-deep">Oficina</Link></li>
             <li><Link href="/loja" className="hover:text-olive-deep">Loja</Link></li>
-            <li><Link href="/escola" className="hover:text-olive-deep">Escola Tática</Link></li>
+            <li><Link href="/treinamentos" className="hover:text-olive-deep">Treinamentos Táticos</Link></li>
           </ul>
         </div>
 

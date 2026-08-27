@@ -16,7 +16,7 @@ export default function ContatoPage() {
       <Hero
         eyebrow="Contato"
         title="Fale com o Complexo"
-        subtitle="Dúvidas sobre partida, oficina, loja ou escola — encontre o canal certo abaixo ou escreva direto pelo formulário."
+        subtitle="Dúvidas sobre partida, oficina, loja ou treinamentos — encontre o canal certo abaixo ou escreva direto pelo formulário."
       />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -61,8 +61,8 @@ export default function ContatoPage() {
                 @safe.works
               </a>
               <p className="mt-2 text-sm text-ink-soft max-w-sm">
-                Bastidores do campo, oficina, loja e escola, além de avisos de
-                agenda.
+                Bastidores do campo, oficina, loja e treinamentos, além de avisos
+                de agenda.
               </p>
             </div>
           </div>

@@ -91,7 +91,7 @@ const FAQ = [
   },
   {
     q: "Preciso de experiência prévia?",
-    a: "Não. Todo jogador passa por um briefing de segurança antes da primeira partida, e a Escola Tática oferece turmas específicas para iniciantes.",
+    a: "Não. Todo jogador passa por um briefing de segurança antes da primeira partida, e os Treinamentos Táticos oferecem turmas específicas para iniciantes.",
   },
   {
     q: "O que acontece se eu for atingido?",
@@ -202,10 +202,10 @@ export default function RegrasPage() {
               arbitragem tem particularidades próprias.
             </p>
             <Link
-              href="/escola"
+              href="/treinamentos"
               className="mt-4 inline-block text-sm font-medium text-olive-deep hover:text-accent"
             >
-              Conhecer a Escola Tática →
+              Conhecer os Treinamentos Táticos →
             </Link>
           </div>
         </div>

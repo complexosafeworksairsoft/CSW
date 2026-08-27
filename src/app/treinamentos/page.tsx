@@ -4,9 +4,9 @@ import Hero from "@/components/Hero";
 import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
-  title: "Escola Tática | Safe Works",
+  title: "Treinamentos Táticos | Safe Works",
   description:
-    "Treinamento de técnica, segurança e tática de airsoft para todos os níveis. Conheça a Escola Tática do Complexo Safe Works.",
+    "Treinamento de técnica, segurança e tática de airsoft para todos os níveis. Conheça os Treinamentos Táticos do Complexo Safe Works.",
 };
 
 function Confirmar() {
@@ -23,21 +23,21 @@ const EIXOS = [
     title: "Manuseio seguro",
     desc: "Postura de arma, regras de dedo fora do gatilho, transporte, travas e comportamento em zona segura antes de qualquer coisa tática.",
     photo: "Foto: instrução de manuseio seguro",
-    slotKey: "escola.eixo.seguranca",
+    slotKey: "treinamentos.eixo.seguranca",
   },
   {
     tag: "técnica",
     title: "Técnica individual",
     desc: "Empunhadura, mira, deslocamento, uso de cobertura e posicionamento — a base que sustenta qualquer estilo de jogo.",
     photo: "Foto: treino de técnica individual",
-    slotKey: "escola.eixo.tecnica",
+    slotKey: "treinamentos.eixo.tecnica",
   },
   {
     tag: "tática",
     title: "Tática em equipe",
     desc: "Comunicação, formação de esquadrão, tomada de decisão sob pressão e leitura de cenário durante uma operação simulada.",
     photo: "Foto: treino tático em equipe",
-    slotKey: "escola.eixo.tatica",
+    slotKey: "treinamentos.eixo.tatica",
   },
 ];
 
@@ -56,14 +56,14 @@ const TURMAS = [
   },
 ];
 
-export default function EscolaPage() {
+export default function TreinamentosPage() {
   return (
     <>
       <Hero
-        eyebrow="Escola tática"
+        eyebrow="Treinamentos táticos"
         title="Aprenda a jogar antes de tentar jogar bem"
         subtitle="Treinamento de segurança, técnica e tática para quem quer entrar no airsoft com uma base sólida — ou elevar o nível de quem já joga."
-        image={<SiteImage slotKey="escola.hero" label="Foto: turma da escola tática" ratio="portrait" />}
+        image={<SiteImage slotKey="treinamentos.hero" label="Foto: turma de treinamentos táticos" ratio="portrait" />}
       />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -72,7 +72,7 @@ export default function EscolaPage() {
           Três eixos de formação
         </h2>
         <p className="mt-3 max-w-2xl text-ink-soft">
-          Toda formação na escola segue a mesma ordem: primeiro segurança, depois
+          Toda formação nos treinamentos táticos segue a mesma ordem: primeiro segurança, depois
           técnica individual, só então tática em equipe. Ninguém pula etapa.
         </p>
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-3">

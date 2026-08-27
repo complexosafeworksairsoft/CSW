@@ -11,7 +11,7 @@ const LINKS = [
   { href: "/campo", label: "Campo de Jogo" },
   { href: "/oficina", label: "Oficina" },
   { href: "/loja", label: "Loja" },
-  { href: "/escola", label: "Escola Tática" },
+  { href: "/treinamentos", label: "Treinamentos Táticos" },
   { href: "/regras", label: "Central de Regras" },
   { href: "/operadores", label: "Operadores" },
   { href: "/contato", label: "Contato" },

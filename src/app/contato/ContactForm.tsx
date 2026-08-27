@@ -13,7 +13,7 @@ const ASSUNTOS = [
   "Agendar partida no campo",
   "Orçamento na oficina",
   "Dúvida sobre a loja",
-  "Escola tática",
+  "Treinamentos táticos",
   "Outro assunto",
 ];
 

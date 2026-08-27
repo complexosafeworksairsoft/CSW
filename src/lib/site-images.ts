@@ -30,13 +30,13 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   { key: "home.pillar.campo", label: "Foto: campo de jogo", group: "Início", ratio: "square" },
   { key: "home.pillar.oficina", label: "Foto: bancada da oficina", group: "Início", ratio: "square" },
   { key: "home.pillar.loja", label: "Foto: vitrine da loja", group: "Início", ratio: "square" },
-  { key: "home.pillar.escola", label: "Foto: treinamento da escola", group: "Início", ratio: "square" },
+  { key: "home.pillar.treinamentos", label: "Foto: treinamentos táticos", group: "Início", ratio: "square" },
 
   { key: "o-complexo.hero", label: "Foto: entrada do Complexo Safe Works", group: "O Complexo", ratio: "portrait" },
   { key: "o-complexo.operacao.campo", label: "Foto: campo de jogo", group: "O Complexo", ratio: "square" },
   { key: "o-complexo.operacao.oficina", label: "Foto: oficina", group: "O Complexo", ratio: "square" },
   { key: "o-complexo.operacao.loja", label: "Foto: loja", group: "O Complexo", ratio: "square" },
-  { key: "o-complexo.operacao.escola", label: "Foto: aula da escola tática", group: "O Complexo", ratio: "square" },
+  { key: "o-complexo.operacao.treinamentos", label: "Foto: aula de treinamentos táticos", group: "O Complexo", ratio: "square" },
 
   { key: "campo.galeria.1", label: "Foto: cenário do campo", group: "Campo de Jogo", ratio: "portrait" },
   { key: "campo.galeria.2", label: "Foto: partida em andamento", group: "Campo de Jogo", ratio: "portrait" },
@@ -51,10 +51,10 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   { key: "loja.categoria.uniformes", label: "Foto: uniformes táticos", group: "Loja", ratio: "square" },
   { key: "loja.categoria.acessorios", label: "Foto: acessórios táticos", group: "Loja", ratio: "square" },
 
-  { key: "escola.hero", label: "Foto: turma da escola tática", group: "Escola Tática", ratio: "portrait" },
-  { key: "escola.eixo.seguranca", label: "Foto: instrução de manuseio seguro", group: "Escola Tática", ratio: "square" },
-  { key: "escola.eixo.tecnica", label: "Foto: treino de técnica individual", group: "Escola Tática", ratio: "square" },
-  { key: "escola.eixo.tatica", label: "Foto: treino tático em equipe", group: "Escola Tática", ratio: "square" },
+  { key: "treinamentos.hero", label: "Foto: turma de treinamentos táticos", group: "Treinamentos Táticos", ratio: "portrait" },
+  { key: "treinamentos.eixo.seguranca", label: "Foto: instrução de manuseio seguro", group: "Treinamentos Táticos", ratio: "square" },
+  { key: "treinamentos.eixo.tecnica", label: "Foto: treino de técnica individual", group: "Treinamentos Táticos", ratio: "square" },
+  { key: "treinamentos.eixo.tatica", label: "Foto: treino tático em equipe", group: "Treinamentos Táticos", ratio: "square" },
 
   { key: "regras.equipamento", label: "Foto: equipamento de proteção completo", group: "Central de Regras", ratio: "wide" },
 

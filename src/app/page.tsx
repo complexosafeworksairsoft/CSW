@@ -27,12 +27,12 @@ const PILLARS = [
     slotKey: "home.pillar.loja",
   },
   {
-    tag: "escola",
-    title: "Escola Tática",
+    tag: "treinamentos",
+    title: "Treinamentos Táticos",
     desc: "Treinamento de técnica, segurança e tática para todos os níveis.",
-    href: "/escola",
-    photo: "Foto: treinamento da escola",
-    slotKey: "home.pillar.escola",
+    href: "/treinamentos",
+    photo: "Foto: treinamentos táticos",
+    slotKey: "home.pillar.treinamentos",
   },
 ];
 
@@ -58,8 +58,8 @@ export default function Home() {
               Complexo Safe Works
             </h1>
             <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-              Campo, oficina, loja e escola de airsoft reunidos em um único endereço.
-              Jogue, aprenda e equipe-se em segurança.
+              Campo, oficina, loja e treinamentos táticos de airsoft reunidos em um
+              único endereço. Jogue, aprenda e equipe-se em segurança.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
