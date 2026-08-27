@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import PhotoTile from "@/components/PhotoTile";
 
 const LINKS = [
   { href: "/", label: "Início" },
@@ -16,7 +17,7 @@ const LINKS = [
   { href: "/contato", label: "Contato" },
 ];
 
-export default function Nav() {
+export default function Nav({ logoPhoto }: { logoPhoto: string | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -24,13 +25,12 @@ export default function Nav() {
     <header className="sticky top-0 z-50 border-b border-line bg-olive-deep text-[#F0EBDB]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 lg:gap-4">
         <Link href="/" className="flex items-center gap-2.5 shrink-0" onClick={() => setOpen(false)}>
-          <span
-            aria-hidden
-            className="flex h-8 w-8 items-center justify-center border border-[#F0EBDB]/35 border-dashed text-[9px] font-mono-safe uppercase tracking-tight text-[#D8D2B8]/70 shrink-0"
-            title="Espaço reservado para a logo"
-          >
-            SW
-          </span>
+          <PhotoTile
+            photo={logoPhoto}
+            label="Logo do Complexo Safe Works"
+            ratio="square"
+            className="h-8 w-8 shrink-0"
+          />
           <span className="font-display text-lg font-semibold tracking-wide sm:text-xl">
             SAFE WORKS
           </span>

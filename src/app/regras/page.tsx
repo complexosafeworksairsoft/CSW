@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Hero from "@/components/Hero";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
   title: "Central de Regras | Safe Works",
@@ -125,7 +125,7 @@ export default function RegrasPage() {
               O que é exigido para entrar em campo
             </h2>
           </div>
-          <ImagePlaceholder label="Foto: equipamento de proteção completo" ratio="wide" />
+          <SiteImage slotKey="regras.equipamento" label="Foto: equipamento de proteção completo" ratio="wide" />
         </div>
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2">
           {EQUIPAMENTO.map((item) => (

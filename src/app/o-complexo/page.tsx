@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Hero from "@/components/Hero";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
   title: "O Complexo | Safe Works",
@@ -16,6 +16,7 @@ const OPERACOES = [
     desc: "O coração do Complexo. Terreno preparado para partidas de airsoft, com cenários, pontos de controle e uma equipe de arbitragem que conduz cada operação.",
     href: "/campo",
     photo: "Foto: campo de jogo",
+    slotKey: "o-complexo.operacao.campo",
   },
   {
     tag: "02 · oficina",
@@ -23,6 +24,7 @@ const OPERACOES = [
     desc: "Suporte técnico para quem já joga. Manutenção, reparo e customização de réplicas feitas por uma equipe que entende o equipamento por dentro.",
     href: "/oficina",
     photo: "Foto: oficina",
+    slotKey: "o-complexo.operacao.oficina",
   },
   {
     tag: "03 · loja",
@@ -30,6 +32,7 @@ const OPERACOES = [
     desc: "Onde o equipamento certo chega até você: réplicas, proteção, uniformes e acessórios selecionados para quem joga com responsabilidade.",
     href: "/loja",
     photo: "Foto: loja",
+    slotKey: "o-complexo.operacao.loja",
   },
   {
     tag: "04 · escola",
@@ -37,6 +40,7 @@ const OPERACOES = [
     desc: "Formação de base e evolução técnica. Ensinamos a jogar com segurança antes de ensinar a jogar bem — nessa ordem.",
     href: "/escola",
     photo: "Foto: aula da escola tática",
+    slotKey: "o-complexo.operacao.escola",
   },
 ];
 
@@ -47,7 +51,7 @@ export default function OComplexoPage() {
         eyebrow="Quem somos"
         title="Um complexo, não só um campo"
         subtitle="O Safe Works nasceu da constatação de que praticar airsoft a sério exige mais do que um terreno para jogar: exige equipamento confiável, gente que saiba consertá-lo e um caminho claro para quem está começando. Por isso reunimos as quatro coisas num único endereço, em Mossoró/RN."
-        image={<ImagePlaceholder label="Foto: entrada do Complexo Safe Works" ratio="portrait" />}
+        image={<SiteImage slotKey="o-complexo.hero" label="Foto: entrada do Complexo Safe Works" ratio="portrait" />}
       />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -92,7 +96,7 @@ export default function OComplexoPage() {
                 href={op.href}
                 className="group bg-surface p-6 hover:bg-surface-2 transition-colors"
               >
-                <ImagePlaceholder label={op.photo} ratio="square" className="mb-4" />
+                <SiteImage slotKey={op.slotKey} label={op.photo} ratio="square" className="mb-4" />
                 <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                   {op.tag}
                 </span>

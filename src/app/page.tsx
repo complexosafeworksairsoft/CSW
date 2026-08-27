@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 const PILLARS = [
   {
@@ -8,6 +8,7 @@ const PILLARS = [
     desc: "Partidas e operações de airsoft em terreno preparado, com regras claras de segurança.",
     href: "/campo",
     photo: "Foto: campo de jogo",
+    slotKey: "home.pillar.campo",
   },
   {
     tag: "oficina",
@@ -15,6 +16,7 @@ const PILLARS = [
     desc: "Manutenção e customização de réplicas, com equipe técnica própria.",
     href: "/oficina",
     photo: "Foto: bancada da oficina",
+    slotKey: "home.pillar.oficina",
   },
   {
     tag: "loja",
@@ -22,6 +24,7 @@ const PILLARS = [
     desc: "Equipamentos, proteção e acessórios táticos para jogar com segurança.",
     href: "/loja",
     photo: "Foto: vitrine da loja",
+    slotKey: "home.pillar.loja",
   },
   {
     tag: "escola",
@@ -29,6 +32,7 @@ const PILLARS = [
     desc: "Treinamento de técnica, segurança e tática para todos os níveis.",
     href: "/escola",
     photo: "Foto: treinamento da escola",
+    slotKey: "home.pillar.escola",
   },
 ];
 
@@ -72,7 +76,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <ImagePlaceholder label="Foto: fachada do Complexo Safe Works" ratio="square" />
+          <SiteImage slotKey="home.hero" label="Foto: fachada do Complexo Safe Works" ratio="square" />
         </div>
       </section>
 
@@ -88,7 +92,7 @@ export default function Home() {
               href={p.href}
               className="group bg-surface p-6 hover:bg-surface-2 transition-colors"
             >
-              <ImagePlaceholder label={p.photo} ratio="square" className="mb-4" />
+              <SiteImage slotKey={p.slotKey} label={p.photo} ratio="square" className="mb-4" />
               <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                 {p.tag}
               </span>

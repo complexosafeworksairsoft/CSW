@@ -8,6 +8,7 @@ import {
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { getSiteImage } from "@/lib/site-images";
 
 const oswald = Oswald({
   variable: "--font-oswald",
@@ -40,13 +41,17 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // Read here (a Server Component) rather than inside Nav.tsx (a Client
+  // Component) — see the note in Nav.tsx for why.
+  const logoPhoto = getSiteImage("nav.logo");
+
   return (
     <html
       lang="pt-BR"
       className={`${oswald.variable} ${bigShouldersStencil.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg text-ink font-body">
-        <Nav />
+        <Nav logoPhoto={logoPhoto} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

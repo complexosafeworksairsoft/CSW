@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Hero from "@/components/Hero";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
   title: "Campo de Jogo | Safe Works",
@@ -120,9 +120,9 @@ export default function CampoPage() {
           O terreno de jogo
         </h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <ImagePlaceholder label="Foto: cenário do campo" ratio="portrait" />
-          <ImagePlaceholder label="Foto: partida em andamento" ratio="portrait" />
-          <ImagePlaceholder label="Foto: equipe de arbitragem" ratio="portrait" />
+          <SiteImage slotKey="campo.galeria.1" label="Foto: cenário do campo" ratio="portrait" />
+          <SiteImage slotKey="campo.galeria.2" label="Foto: partida em andamento" ratio="portrait" />
+          <SiteImage slotKey="campo.galeria.3" label="Foto: equipe de arbitragem" ratio="portrait" />
         </div>
       </section>
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Hero from "@/components/Hero";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
   title: "Escola Tática | Safe Works",
@@ -23,18 +23,21 @@ const EIXOS = [
     title: "Manuseio seguro",
     desc: "Postura de arma, regras de dedo fora do gatilho, transporte, travas e comportamento em zona segura antes de qualquer coisa tática.",
     photo: "Foto: instrução de manuseio seguro",
+    slotKey: "escola.eixo.seguranca",
   },
   {
     tag: "técnica",
     title: "Técnica individual",
     desc: "Empunhadura, mira, deslocamento, uso de cobertura e posicionamento — a base que sustenta qualquer estilo de jogo.",
     photo: "Foto: treino de técnica individual",
+    slotKey: "escola.eixo.tecnica",
   },
   {
     tag: "tática",
     title: "Tática em equipe",
     desc: "Comunicação, formação de esquadrão, tomada de decisão sob pressão e leitura de cenário durante uma operação simulada.",
     photo: "Foto: treino tático em equipe",
+    slotKey: "escola.eixo.tatica",
   },
 ];
 
@@ -60,7 +63,7 @@ export default function EscolaPage() {
         eyebrow="Escola tática"
         title="Aprenda a jogar antes de tentar jogar bem"
         subtitle="Treinamento de segurança, técnica e tática para quem quer entrar no airsoft com uma base sólida — ou elevar o nível de quem já joga."
-        image={<ImagePlaceholder label="Foto: turma da escola tática" ratio="portrait" />}
+        image={<SiteImage slotKey="escola.hero" label="Foto: turma da escola tática" ratio="portrait" />}
       />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -75,7 +78,7 @@ export default function EscolaPage() {
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-3">
           {EIXOS.map((e) => (
             <div key={e.title} className="bg-surface p-6">
-              <ImagePlaceholder label={e.photo} ratio="square" className="mb-4" />
+              <SiteImage slotKey={e.slotKey} label={e.photo} ratio="square" className="mb-4" />
               <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                 {e.tag}
               </span>

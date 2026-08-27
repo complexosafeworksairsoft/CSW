@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Hero from "@/components/Hero";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
   title: "Loja | Safe Works",
@@ -15,24 +15,28 @@ const CATEGORIAS = [
     title: "Réplicas",
     desc: "AEGs, GBBs e outras plataformas para os diferentes estilos de jogo, dos primeiros passos à competição.",
     photo: "Foto: réplicas em exposição",
+    slotKey: "loja.categoria.replicas",
   },
   {
     tag: "proteção",
     title: "Proteção",
     desc: "Óculos balísticos, máscaras de rosto inteiro e proteção auditiva — o item que nunca deve faltar na mochila de ninguém.",
     photo: "Foto: equipamento de proteção",
+    slotKey: "loja.categoria.protecao",
   },
   {
     tag: "uniformes",
     title: "Uniformes",
     desc: "Fardas, botas e luvas táticas pensadas para o terreno do campo, com durabilidade para uso frequente.",
     photo: "Foto: uniformes táticos",
+    slotKey: "loja.categoria.uniformes",
   },
   {
     tag: "acessórios",
     title: "Acessórios",
     desc: "Coletes, porta-carregadores, munição (BBs), baterias, carregadores e itens de manutenção básica.",
     photo: "Foto: acessórios táticos",
+    slotKey: "loja.categoria.acessorios",
   },
 ];
 
@@ -58,7 +62,7 @@ export default function LojaPage() {
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2 lg:grid-cols-4">
           {CATEGORIAS.map((c) => (
             <div key={c.title} className="bg-surface p-6">
-              <ImagePlaceholder label={c.photo} ratio="square" className="mb-4" />
+              <SiteImage slotKey={c.slotKey} label={c.photo} ratio="square" className="mb-4" />
               <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                 {c.tag}
               </span>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import ContactForm from "./ContactForm";
 import Hero from "@/components/Hero";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
   title: "Contato | Safe Works",
@@ -22,7 +22,7 @@ export default function ContatoPage() {
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
           <div className="space-y-6">
-            <ImagePlaceholder label="Foto: fachada / localização do Complexo" ratio="video" />
+            <SiteImage slotKey="contato.localizacao" label="Foto: fachada / localização do Complexo" ratio="video" />
             <div>
               <p className="eyebrow">Localização</p>
               <h2 className="mt-2 font-display text-2xl font-semibold text-ink">

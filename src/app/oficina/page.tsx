@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Hero from "@/components/Hero";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import SiteImage from "@/components/SiteImage";
 
 export const metadata: Metadata = {
   title: "Oficina | Safe Works",
@@ -83,7 +83,7 @@ export default function OficinaPage() {
             Levar minha réplica
           </Link>
         }
-        image={<ImagePlaceholder label="Foto: bancada da oficina" ratio="portrait" />}
+        image={<SiteImage slotKey="oficina.hero" label="Foto: bancada da oficina" ratio="portrait" />}
       />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -138,8 +138,8 @@ export default function OficinaPage() {
             Antes e depois
           </h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <ImagePlaceholder label="Foto: réplica antes do serviço" ratio="video" />
-            <ImagePlaceholder label="Foto: réplica depois do serviço" ratio="video" />
+            <SiteImage slotKey="oficina.antes" label="Foto: réplica antes do serviço" ratio="video" />
+            <SiteImage slotKey="oficina.depois" label="Foto: réplica depois do serviço" ratio="video" />
           </div>
         </div>
       </section>
