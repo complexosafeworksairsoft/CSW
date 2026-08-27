@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #EDE8DC;
+  --surface: #F7F4EA;
+  --surface-2: #FFFFFF;
+  --ink: #21241D;
+  --ink-soft: #4B4E42;
+  --olive: #4B5320;
+  --olive-deep: #363B17;
+  --accent: #D9720C;
+  --muted: #7A7864;
+  --line: #C9C2AC;
+  --line-strong: #A8A084;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1A1C15;
+    --surface: #21241B;
+    --surface-2: #262A1E;
+    --ink: #E9E4D4;
+    --ink-soft: #C4C0AC;
+    --olive: #93A35F;
+    --olive-deep: #B9C98A;
+    --accent: #F2954A;
+    --muted: #9B9880;
+    --line: #3A3D2E;
+    --line-strong: #4C503B;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-olive: var(--olive);
+  --color-olive-deep: var(--olive-deep);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --font-display: var(--font-oswald), "Arial Narrow", sans-serif;
+  --font-stencil: var(--font-big-shoulders-stencil), var(--font-oswald), sans-serif;
+  --font-body: var(--font-plex-sans), "Segoe UI", sans-serif;
+  --font-mono-safe: var(--font-plex-mono), "Consolas", monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.eyebrow {
+  font-family: var(--font-stencil);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--accent);
+}
