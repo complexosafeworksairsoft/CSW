@@ -26,7 +26,7 @@ export const MATCHES: MatchEvent[] = [
     operationType: "CQB — Cerco e resgate",
     location: "Setor 2, Complexo Safe Works",
     notes: "Chegada 30min antes para briefing e checagem de equipamento.",
-    confirmedTeamIds: ["t-condor"],
+    confirmedTeamIds: ["t-dec"],
   },
   {
     id: "op-2026-09-20",
@@ -45,7 +45,7 @@ export const MATCHES: MatchEvent[] = [
     operationType: "Milsim — 6 horas",
     location: "Setores 1, 2 e 3, Complexo Safe Works",
     notes: "Evento longo. Levar hidratação extra e réplica secundária, se houver.",
-    confirmedTeamIds: ["t-lobos", "t-scorpio"],
+    confirmedTeamIds: ["t-csa", "t-cans"],
   },
   {
     id: "op-2026-10-18",
