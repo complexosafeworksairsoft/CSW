@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Hero from "@/components/Hero";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 export const metadata: Metadata = {
   title: "Oficina | Safe Works",
@@ -69,34 +71,20 @@ const ETAPAS = [
 export default function OficinaPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-olive-deep text-[#F0EBDB]">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(75,83,32,0.35) 27px, rgba(75,83,32,0.35) 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(75,83,32,0.25) 27px, rgba(75,83,32,0.25) 28px)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="eyebrow">Oficina</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold leading-tight sm:text-5xl max-w-2xl text-[#F6F2E4]">
-            Sua réplica nas mãos de quem entende o mecanismo
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-            Manutenção, reparo e customização de réplicas de airsoft, com equipe
-            técnica própria e diagnóstico antes de qualquer serviço.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/contato"
-              className="bg-accent text-[#231400] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
-            >
-              Levar minha réplica
-            </Link>
-          </div>
-        </div>
-      </section>
+      <Hero
+        eyebrow="Oficina"
+        title="Sua réplica nas mãos de quem entende o mecanismo"
+        subtitle="Manutenção, reparo e customização de réplicas de airsoft, com equipe técnica própria e diagnóstico antes de qualquer serviço."
+        actions={
+          <Link
+            href="/contato"
+            className="bg-accent text-[#231400] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
+          >
+            Levar minha réplica
+          </Link>
+        }
+        image={<ImagePlaceholder label="Foto: bancada da oficina" ratio="portrait" />}
+      />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <p className="eyebrow">O que fazemos</p>
@@ -143,27 +131,42 @@ export default function OficinaPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <p className="eyebrow">Valores</p>
-        <h2 className="mt-2 font-display text-3xl font-semibold text-ink">
-          Orçamento sob avaliação
-        </h2>
-        <div className="mt-6 max-w-2xl flex items-start justify-between gap-4 bg-surface border border-line p-6 rounded-sm">
-          <p className="text-ink-soft">
-            Cada réplica chega com um histórico e um problema diferentes, então o
-            valor do serviço é definido depois do diagnóstico técnico — nunca
-            antes. A tabela de preços de serviços mais comuns (limpeza, revisão,
-            troca de peças de desgaste) está em definição.
-          </p>
-          <Confirmar />
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <p className="eyebrow">Resultado</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-ink">
+            Antes e depois
+          </h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <ImagePlaceholder label="Foto: réplica antes do serviço" ratio="video" />
+            <ImagePlaceholder label="Foto: réplica depois do serviço" ratio="video" />
+          </div>
         </div>
-        <div className="mt-6">
-          <Link
-            href="/contato"
-            className="inline-block bg-olive-deep text-[#F0EBDB] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
-          >
-            Pedir um orçamento
-          </Link>
+      </section>
+
+      <section className="border-t border-line bg-surface">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <p className="eyebrow">Valores</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-ink">
+            Orçamento sob avaliação
+          </h2>
+          <div className="mt-6 max-w-2xl flex items-start justify-between gap-4 bg-surface-2 border border-line p-6 rounded-sm">
+            <p className="text-ink-soft">
+              Cada réplica chega com um histórico e um problema diferentes, então o
+              valor do serviço é definido depois do diagnóstico técnico — nunca
+              antes. A tabela de preços de serviços mais comuns (limpeza, revisão,
+              troca de peças de desgaste) está em definição.
+            </p>
+            <Confirmar />
+          </div>
+          <div className="mt-6">
+            <Link
+              href="/contato"
+              className="inline-block bg-olive-deep text-[#F0EBDB] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
+            >
+              Pedir um orçamento
+            </Link>
+          </div>
         </div>
       </section>
     </>

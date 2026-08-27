@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Hero from "@/components/Hero";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 export const metadata: Metadata = {
   title: "Loja | Safe Works",
@@ -12,48 +14,36 @@ const CATEGORIAS = [
     tag: "réplicas",
     title: "Réplicas",
     desc: "AEGs, GBBs e outras plataformas para os diferentes estilos de jogo, dos primeiros passos à competição.",
+    photo: "Foto: réplicas em exposição",
   },
   {
     tag: "proteção",
     title: "Proteção",
     desc: "Óculos balísticos, máscaras de rosto inteiro e proteção auditiva — o item que nunca deve faltar na mochila de ninguém.",
+    photo: "Foto: equipamento de proteção",
   },
   {
     tag: "uniformes",
     title: "Uniformes",
     desc: "Fardas, botas e luvas táticas pensadas para o terreno do campo, com durabilidade para uso frequente.",
+    photo: "Foto: uniformes táticos",
   },
   {
     tag: "acessórios",
     title: "Acessórios",
     desc: "Coletes, porta-carregadores, munição (BBs), baterias, carregadores e itens de manutenção básica.",
+    photo: "Foto: acessórios táticos",
   },
 ];
 
 export default function LojaPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-olive-deep text-[#F0EBDB]">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(75,83,32,0.35) 27px, rgba(75,83,32,0.35) 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(75,83,32,0.25) 27px, rgba(75,83,32,0.25) 28px)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="eyebrow">Loja</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold leading-tight sm:text-5xl max-w-2xl text-[#F6F2E4]">
-            Equipar-se certo é parte de jogar seguro
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-            Réplicas, proteção, uniformes e acessórios selecionados para quem leva
-            o airsoft a sério — do primeiro óculos de proteção ao upgrade da
-            réplica principal.
-          </p>
-        </div>
-      </section>
+      <Hero
+        eyebrow="Loja"
+        title="Equipar-se certo é parte de jogar seguro"
+        subtitle="Réplicas, proteção, uniformes e acessórios selecionados para quem leva o airsoft a sério — do primeiro óculos de proteção ao upgrade da réplica principal."
+      />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <p className="eyebrow">O que vendemos</p>
@@ -68,6 +58,7 @@ export default function LojaPage() {
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2 lg:grid-cols-4">
           {CATEGORIAS.map((c) => (
             <div key={c.title} className="bg-surface p-6">
+              <ImagePlaceholder label={c.photo} ratio="square" className="mb-4" />
               <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                 {c.tag}
               </span>

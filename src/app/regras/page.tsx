@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Hero from "@/components/Hero";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 export const metadata: Metadata = {
   title: "Central de Regras | Safe Works",
@@ -109,32 +111,22 @@ const FAQ = [
 export default function RegrasPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-olive-deep text-[#F0EBDB]">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(75,83,32,0.35) 27px, rgba(75,83,32,0.35) 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(75,83,32,0.25) 27px, rgba(75,83,32,0.25) 28px)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="eyebrow">Central de regras</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold leading-tight sm:text-5xl max-w-2xl text-[#F6F2E4]">
-            Tudo o que você precisa saber antes de entrar em campo
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-            Equipamento obrigatório, regras de conduta, o que trazer e as
-            perguntas mais comuns de quem está começando no airsoft.
-          </p>
-        </div>
-      </section>
+      <Hero
+        eyebrow="Central de regras"
+        title="Tudo o que você precisa saber antes de entrar em campo"
+        subtitle="Equipamento obrigatório, regras de conduta, o que trazer e as perguntas mais comuns de quem está começando no airsoft."
+      />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <p className="eyebrow">Equipamento obrigatório</p>
-        <h2 className="mt-2 font-display text-3xl font-semibold text-ink">
-          O que é exigido para entrar em campo
-        </h2>
+        <div className="grid gap-10 lg:grid-cols-[1fr_0.8fr] lg:items-start">
+          <div>
+            <p className="eyebrow">Equipamento obrigatório</p>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-ink">
+              O que é exigido para entrar em campo
+            </h2>
+          </div>
+          <ImagePlaceholder label="Foto: equipamento de proteção completo" ratio="wide" />
+        </div>
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-2">
           {EQUIPAMENTO.map((item) => (
             <div key={item.title} className="bg-surface p-6">

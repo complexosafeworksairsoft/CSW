@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 const PILLARS = [
   {
@@ -6,24 +7,28 @@ const PILLARS = [
     title: "Campo de Jogo",
     desc: "Partidas e operações de airsoft em terreno preparado, com regras claras de segurança.",
     href: "/campo",
+    photo: "Foto: campo de jogo",
   },
   {
     tag: "oficina",
     title: "Oficina",
     desc: "Manutenção e customização de réplicas, com equipe técnica própria.",
     href: "/oficina",
+    photo: "Foto: bancada da oficina",
   },
   {
     tag: "loja",
     title: "Loja",
     desc: "Equipamentos, proteção e acessórios táticos para jogar com segurança.",
     href: "/loja",
+    photo: "Foto: vitrine da loja",
   },
   {
     tag: "escola",
     title: "Escola Tática",
     desc: "Treinamento de técnica, segurança e tática para todos os níveis.",
     href: "/escola",
+    photo: "Foto: treinamento da escola",
   },
 ];
 
@@ -39,32 +44,35 @@ export default function Home() {
               "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(75,83,32,0.35) 27px, rgba(75,83,32,0.35) 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(75,83,32,0.25) 27px, rgba(75,83,32,0.25) 28px)",
           }}
         />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <span className="inline-flex items-center gap-2 font-mono-safe text-xs uppercase tracking-widest text-[#D8D2B8] border border-[#F0EBDB]/35 px-3 py-1 rounded-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Mossoró / RN
-          </span>
-          <h1 className="mt-5 font-display text-4xl font-semibold leading-tight sm:text-6xl max-w-2xl text-[#F6F2E4]">
-            Complexo Safe Works
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-            Campo, oficina, loja e escola de airsoft reunidos em um único endereço.
-            Jogue, aprenda e equipe-se em segurança.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/campo"
-              className="bg-accent text-[#231400] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
-            >
-              Conhecer o campo
-            </Link>
-            <Link
-              href="/regras"
-              className="border border-[#F0EBDB]/35 px-5 py-3 rounded-sm hover:border-accent hover:text-accent transition-colors"
-            >
-              Central de regras
-            </Link>
+        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <span className="inline-flex items-center gap-2 font-mono-safe text-xs uppercase tracking-widest text-[#D8D2B8] border border-[#F0EBDB]/35 px-3 py-1 rounded-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              Mossoró / RN
+            </span>
+            <h1 className="mt-5 font-display text-4xl font-semibold leading-tight sm:text-6xl max-w-2xl text-[#F6F2E4]">
+              Complexo Safe Works
+            </h1>
+            <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
+              Campo, oficina, loja e escola de airsoft reunidos em um único endereço.
+              Jogue, aprenda e equipe-se em segurança.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/campo"
+                className="bg-accent text-[#231400] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
+              >
+                Conhecer o campo
+              </Link>
+              <Link
+                href="/regras"
+                className="border border-[#F0EBDB]/35 px-5 py-3 rounded-sm hover:border-accent hover:text-accent transition-colors"
+              >
+                Central de regras
+              </Link>
+            </div>
           </div>
+          <ImagePlaceholder label="Foto: fachada do Complexo Safe Works" ratio="square" />
         </div>
       </section>
 
@@ -80,6 +88,7 @@ export default function Home() {
               href={p.href}
               className="group bg-surface p-6 hover:bg-surface-2 transition-colors"
             >
+              <ImagePlaceholder label={p.photo} ratio="square" className="mb-4" />
               <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                 {p.tag}
               </span>

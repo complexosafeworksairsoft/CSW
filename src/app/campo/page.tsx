@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Hero from "@/components/Hero";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 export const metadata: Metadata = {
   title: "Campo de Jogo | Safe Works",
@@ -67,26 +69,12 @@ const PRINCIPIOS = [
 export default function CampoPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-olive-deep text-[#F0EBDB]">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(75,83,32,0.35) 27px, rgba(75,83,32,0.35) 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(75,83,32,0.25) 27px, rgba(75,83,32,0.25) 28px)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="eyebrow">Campo de jogo</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold leading-tight sm:text-5xl max-w-2xl text-[#F6F2E4]">
-            Terreno preparado, regras claras, arbitragem em campo
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-            Partidas de airsoft conduzidas do início ao fim: check-in, briefing,
-            cenário, jogo e debriefing. Nada de improviso na hora de falar de
-            segurança.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+      <Hero
+        eyebrow="Campo de jogo"
+        title="Terreno preparado, regras claras, arbitragem em campo"
+        subtitle="Partidas de airsoft conduzidas do início ao fim: check-in, briefing, cenário, jogo e debriefing. Nada de improviso na hora de falar de segurança."
+        actions={
+          <>
             <Link
               href="/regras"
               className="bg-accent text-[#231400] font-semibold px-5 py-3 rounded-sm hover:opacity-90 transition-opacity"
@@ -99,9 +87,9 @@ export default function CampoPage() {
             >
               Agendar uma partida
             </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <p className="eyebrow">Como funciona</p>
@@ -123,6 +111,18 @@ export default function CampoPage() {
               <p className="mt-2 text-sm text-ink-soft">{e.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <p className="eyebrow">Galeria</p>
+        <h2 className="mt-2 font-display text-3xl font-semibold text-ink">
+          O terreno de jogo
+        </h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <ImagePlaceholder label="Foto: cenário do campo" ratio="portrait" />
+          <ImagePlaceholder label="Foto: partida em andamento" ratio="portrait" />
+          <ImagePlaceholder label="Foto: equipe de arbitragem" ratio="portrait" />
         </div>
       </section>
 

@@ -22,7 +22,14 @@ export default function Nav() {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-olive-deep text-[#F0EBDB]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 shrink-0" onClick={() => setOpen(false)}>
+        <Link href="/" className="flex items-center gap-2.5 shrink-0" onClick={() => setOpen(false)}>
+          <span
+            aria-hidden
+            className="flex h-8 w-8 items-center justify-center border border-[#F0EBDB]/35 border-dashed text-[9px] font-mono-safe uppercase tracking-tight text-[#D8D2B8]/70 shrink-0"
+            title="Espaço reservado para a logo"
+          >
+            SW
+          </span>
           <span className="font-display text-lg font-semibold tracking-wide sm:text-xl">
             SAFE WORKS
           </span>

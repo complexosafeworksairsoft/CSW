@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Hero from "@/components/Hero";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 export const metadata: Metadata = {
   title: "O Complexo | Safe Works",
@@ -13,52 +15,40 @@ const OPERACOES = [
     title: "Campo de Jogo",
     desc: "O coração do Complexo. Terreno preparado para partidas de airsoft, com cenários, pontos de controle e uma equipe de arbitragem que conduz cada operação.",
     href: "/campo",
+    photo: "Foto: campo de jogo",
   },
   {
     tag: "02 · oficina",
     title: "Oficina",
     desc: "Suporte técnico para quem já joga. Manutenção, reparo e customização de réplicas feitas por uma equipe que entende o equipamento por dentro.",
     href: "/oficina",
+    photo: "Foto: oficina",
   },
   {
     tag: "03 · loja",
     title: "Loja",
     desc: "Onde o equipamento certo chega até você: réplicas, proteção, uniformes e acessórios selecionados para quem joga com responsabilidade.",
     href: "/loja",
+    photo: "Foto: loja",
   },
   {
     tag: "04 · escola",
     title: "Escola Tática",
     desc: "Formação de base e evolução técnica. Ensinamos a jogar com segurança antes de ensinar a jogar bem — nessa ordem.",
     href: "/escola",
+    photo: "Foto: aula da escola tática",
   },
 ];
 
 export default function OComplexoPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-olive-deep text-[#F0EBDB]">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(75,83,32,0.35) 27px, rgba(75,83,32,0.35) 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(75,83,32,0.25) 27px, rgba(75,83,32,0.25) 28px)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="eyebrow">Quem somos</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold leading-tight sm:text-5xl max-w-2xl text-[#F6F2E4]">
-            Um complexo, não só um campo
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-            O Safe Works nasceu da constatação de que praticar airsoft a sério exige
-            mais do que um terreno para jogar: exige equipamento confiável, gente
-            que saiba consertá-lo e um caminho claro para quem está começando.
-            Por isso reunimos as quatro coisas num único endereço, em Mossoró/RN.
-          </p>
-        </div>
-      </section>
+      <Hero
+        eyebrow="Quem somos"
+        title="Um complexo, não só um campo"
+        subtitle="O Safe Works nasceu da constatação de que praticar airsoft a sério exige mais do que um terreno para jogar: exige equipamento confiável, gente que saiba consertá-lo e um caminho claro para quem está começando. Por isso reunimos as quatro coisas num único endereço, em Mossoró/RN."
+        image={<ImagePlaceholder label="Foto: entrada do Complexo Safe Works" ratio="portrait" />}
+      />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <p className="eyebrow">O que é o complexo</p>
@@ -102,6 +92,7 @@ export default function OComplexoPage() {
                 href={op.href}
                 className="group bg-surface p-6 hover:bg-surface-2 transition-colors"
               >
+                <ImagePlaceholder label={op.photo} ratio="square" className="mb-4" />
                 <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                   {op.tag}
                 </span>

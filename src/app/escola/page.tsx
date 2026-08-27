@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Hero from "@/components/Hero";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 export const metadata: Metadata = {
   title: "Escola Tática | Safe Works",
@@ -20,16 +22,19 @@ const EIXOS = [
     tag: "segurança",
     title: "Manuseio seguro",
     desc: "Postura de arma, regras de dedo fora do gatilho, transporte, travas e comportamento em zona segura antes de qualquer coisa tática.",
+    photo: "Foto: instrução de manuseio seguro",
   },
   {
     tag: "técnica",
     title: "Técnica individual",
     desc: "Empunhadura, mira, deslocamento, uso de cobertura e posicionamento — a base que sustenta qualquer estilo de jogo.",
+    photo: "Foto: treino de técnica individual",
   },
   {
     tag: "tática",
     title: "Tática em equipe",
     desc: "Comunicação, formação de esquadrão, tomada de decisão sob pressão e leitura de cenário durante uma operação simulada.",
+    photo: "Foto: treino tático em equipe",
   },
 ];
 
@@ -51,26 +56,12 @@ const TURMAS = [
 export default function EscolaPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-olive-deep text-[#F0EBDB]">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(75,83,32,0.35) 27px, rgba(75,83,32,0.35) 28px), repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(75,83,32,0.25) 27px, rgba(75,83,32,0.25) 28px)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="eyebrow">Escola tática</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold leading-tight sm:text-5xl max-w-2xl text-[#F6F2E4]">
-            Aprenda a jogar antes de tentar jogar bem
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
-            Treinamento de segurança, técnica e tática para quem quer entrar no
-            airsoft com uma base sólida — ou elevar o nível de quem já joga.
-          </p>
-        </div>
-      </section>
+      <Hero
+        eyebrow="Escola tática"
+        title="Aprenda a jogar antes de tentar jogar bem"
+        subtitle="Treinamento de segurança, técnica e tática para quem quer entrar no airsoft com uma base sólida — ou elevar o nível de quem já joga."
+        image={<ImagePlaceholder label="Foto: turma da escola tática" ratio="portrait" />}
+      />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <p className="eyebrow">O que ensinamos</p>
@@ -84,6 +75,7 @@ export default function EscolaPage() {
         <div className="mt-8 grid gap-px bg-line border border-line sm:grid-cols-3">
           {EIXOS.map((e) => (
             <div key={e.title} className="bg-surface p-6">
+              <ImagePlaceholder label={e.photo} ratio="square" className="mb-4" />
               <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                 {e.tag}
               </span>
