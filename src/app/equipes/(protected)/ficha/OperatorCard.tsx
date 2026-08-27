@@ -1,6 +1,7 @@
 import ImagePlaceholder from "@/components/ImagePlaceholder";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { MAX_EQUIPMENT_PER_OPERATOR, type Equipment, type Operator } from "@/lib/roster-data";
-import { removeEquipmentAction, removeOperatorAction } from "../../roster-actions";
+import { removeEquipmentAction, removeOperatorAction, togglePublicAction } from "../../roster-actions";
 import AddEquipmentForm from "./AddEquipmentForm";
 
 const MONTHS_PT = [
@@ -71,15 +72,36 @@ export default function OperatorCard({ operator }: { operator: OperatorWithEquip
         </div>
       </div>
 
-      <form action={removeOperatorAction}>
-        <input type="hidden" name="operatorId" value={operator.id} />
-        <button
-          type="submit"
-          className="font-mono-safe text-xs uppercase tracking-widest text-muted hover:text-accent transition-colors"
-        >
-          Remover operador
-        </button>
-      </form>
+      <div className="flex flex-wrap items-center gap-3">
+        <form action={togglePublicAction}>
+          <input type="hidden" name="operatorId" value={operator.id} />
+          <input type="hidden" name="nextIsPublic" value={operator.isPublic ? "false" : "true"} />
+          <button
+            type="submit"
+            className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 font-mono-safe text-[11px] uppercase tracking-widest transition-colors ${
+              operator.isPublic
+                ? "border-accent text-accent hover:opacity-80"
+                : "border-line-strong text-muted hover:border-accent hover:text-accent"
+            }`}
+            title={
+              operator.isPublic
+                ? "Visível na página pública de Operadores — clique para tornar privado"
+                : "Não aparece no site — clique para tornar público"
+            }
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${operator.isPublic ? "bg-accent" : "bg-muted"}`} />
+            {operator.isPublic ? "Público" : "Privado"}
+          </button>
+        </form>
+
+        <form action={removeOperatorAction}>
+          <input type="hidden" name="operatorId" value={operator.id} />
+          <ConfirmDeleteButton
+            label="Excluir operador"
+            confirmMessage="Tem certeza que deseja excluir este operador? Essa ação não pode ser desfeita."
+          />
+        </form>
+      </div>
 
       <div className="border-t border-line pt-4">
         <div className="flex items-baseline justify-between gap-2">
@@ -112,12 +134,11 @@ export default function OperatorCard({ operator }: { operator: OperatorWithEquip
                 <form action={removeEquipmentAction} className="mt-2">
                   <input type="hidden" name="operatorId" value={operator.id} />
                   <input type="hidden" name="equipmentId" value={item.id} />
-                  <button
-                    type="submit"
-                    className="font-mono-safe text-[11px] uppercase tracking-widest text-muted hover:text-accent transition-colors"
-                  >
-                    Remover
-                  </button>
+                  <ConfirmDeleteButton
+                    label="Excluir"
+                    confirmMessage="Tem certeza que deseja excluir este equipamento? Essa ação não pode ser desfeita."
+                    size="sm"
+                  />
                 </form>
               </li>
             ))}

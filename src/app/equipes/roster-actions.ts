@@ -10,6 +10,7 @@ import {
   getOperatorForTeam,
   removeEquipment,
   removeOperator,
+  setOperatorPublic,
   updateTeamProfile,
 } from "@/lib/roster-data";
 
@@ -71,6 +72,7 @@ export async function addOperatorAction(
   const tag = String(formData.get("tag") ?? "").trim();
   const startMonth = String(formData.get("startMonth") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim();
+  const isPublic = formData.get("isPublic") === "on";
 
   if (!name || !tag) {
     return {
@@ -85,6 +87,7 @@ export async function addOperatorAction(
     tag: tag.slice(0, 40),
     startMonth: startMonth.slice(0, 7),
     category: category.slice(0, 80),
+    isPublic,
   });
 
   if (!result.ok) {
@@ -169,6 +172,28 @@ export async function removeEquipmentAction(formData: FormData): Promise<void> {
   const operator = getOperatorForTeam(teamId, operatorId);
   if (operator && equipmentId) {
     removeEquipment(operator.id, equipmentId);
+  }
+
+  revalidatePath(FICHA_PATH);
+}
+
+/**
+ * Flips an operator's public/private flag. Lets a team change its mind about
+ * showing someone on the public site without deleting and re-adding them.
+ * `nextIsPublic` travels as a hidden field set to the opposite of the
+ * operator's current state, so the button always toggles regardless of how
+ * many times the page has been revalidated.
+ */
+export async function togglePublicAction(formData: FormData): Promise<void> {
+  const teamId = await readSessionTeamId();
+  if (!teamId) {
+    redirect("/equipes/login");
+  }
+
+  const operatorId = String(formData.get("operatorId") ?? "");
+  const nextIsPublic = formData.get("nextIsPublic") === "true";
+  if (operatorId) {
+    setOperatorPublic(teamId, operatorId, nextIsPublic);
   }
 
   revalidatePath(FICHA_PATH);

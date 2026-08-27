@@ -70,6 +70,25 @@ export default function AddOperatorForm() {
               className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
+
+          <div className="sm:col-span-2">
+            <label className="flex items-start gap-3">
+              <input
+                id="op-public"
+                name="isPublic"
+                type="checkbox"
+                className="mt-1 h-4 w-4 shrink-0 rounded-sm border border-line-strong bg-surface-2 accent-accent"
+              />
+              <span>
+                <span className="block font-mono-safe text-xs uppercase tracking-widest text-ink-soft">
+                  Tornar operador público
+                </span>
+                <span className="mt-1 block text-xs text-muted">
+                  Operadores públicos aparecem na página &quot;Operadores&quot; do site, com foto, nome, TAG e equipe.
+                </span>
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 

@@ -31,6 +31,8 @@ export type Operator = {
   tag: string;
   startMonth: string; // "AAAA-MM"
   category: string;
+  isPublic: boolean; // shows on the public /operadores page when true
+  updatedAt: number; // epoch ms — see touchOperator() for what bumps this
 };
 
 export type Equipment = {
@@ -87,6 +89,7 @@ export type AddOperatorInput = {
   tag: string;
   startMonth: string;
   category: string;
+  isPublic: boolean;
 };
 
 export function addOperator(
@@ -99,7 +102,12 @@ export function addOperator(
       error: `Limite de ${MAX_OPERATORS_PER_TEAM} operadores atingido.`,
     };
   }
-  const operator: Operator = { id: generateId("op"), teamId, ...input };
+  const operator: Operator = {
+    id: generateId("op"),
+    teamId,
+    ...input,
+    updatedAt: Date.now(),
+  };
   OPERATORS.push(operator);
   return { ok: true, operator };
 }
@@ -112,6 +120,31 @@ export function removeOperator(teamId: string, operatorId: string): void {
   for (let i = EQUIPMENT.length - 1; i >= 0; i--) {
     if (EQUIPMENT[i].operatorId === operatorId) EQUIPMENT.splice(i, 1);
   }
+}
+
+/**
+ * Bumps `updatedAt` on an operator to "now". There's no operator-edit form
+ * yet, so this is called from the few places that do change something about
+ * an operator after creation: toggling `isPublic` and adding/removing
+ * equipamentos. Used to drive the public "Destaques" (most recently
+ * updated) section — see getRecentPublicOperators() below.
+ */
+function touchOperator(operatorId: string): void {
+  const operator = OPERATORS.find((o) => o.id === operatorId);
+  if (operator) operator.updatedAt = Date.now();
+}
+
+/** Flips (or explicitly sets) an operator's public/private flag, scoped to the team. */
+export function setOperatorPublic(
+  teamId: string,
+  operatorId: string,
+  isPublic: boolean
+): Operator | null {
+  const operator = getOperatorForTeam(teamId, operatorId);
+  if (!operator) return null;
+  operator.isPublic = isPublic;
+  touchOperator(operator.id);
+  return operator;
 }
 
 export function getEquipment(operatorId: string): Equipment[] {
@@ -137,6 +170,7 @@ export function addEquipment(
   }
   const equipment: Equipment = { id: generateId("eq"), operatorId, ...input };
   EQUIPMENT.push(equipment);
+  touchOperator(operatorId);
   return { ok: true, equipment };
 }
 
@@ -144,4 +178,37 @@ export function removeEquipment(operatorId: string, equipmentId: string): void {
   const idx = EQUIPMENT.findIndex((e) => e.id === equipmentId && e.operatorId === operatorId);
   if (idx === -1) return;
   EQUIPMENT.splice(idx, 1);
+  touchOperator(operatorId);
+}
+
+// --- Public "Operadores" page queries -------------------------------------
+// Everything below only ever exposes operators with isPublic === true. None
+// of it should be used from the team portal (which shows a team's own
+// operators regardless of visibility via getOperators()).
+
+/** All operators across all teams that have opted in to being shown publicly. */
+export function getPublicOperators(): Operator[] {
+  return OPERATORS.filter((o) => o.isPublic);
+}
+
+/** The `limit` most recently updated public operators, newest first. */
+export function getRecentPublicOperators(limit: number): Operator[] {
+  return getPublicOperators()
+    .slice()
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+    .slice(0, limit);
+}
+
+/** Teams that have at least one public operator, with their public operator count. */
+export function getTeamsWithPublicOperators(): { teamId: string; publicCount: number }[] {
+  const counts = new Map<string, number>();
+  for (const operator of getPublicOperators()) {
+    counts.set(operator.teamId, (counts.get(operator.teamId) ?? 0) + 1);
+  }
+  return Array.from(counts.entries()).map(([teamId, publicCount]) => ({ teamId, publicCount }));
+}
+
+/** Public operators belonging to one team (e.g. for the per-team public roster page). */
+export function getPublicOperatorsForTeam(teamId: string): Operator[] {
+  return OPERATORS.filter((o) => o.teamId === teamId && o.isPublic);
 }
