@@ -21,21 +21,21 @@ export type Team = {
 
 export const TEAMS: Team[] = [
   {
-    id: "t-lobos",
-    teamCode: "LOBOS-01",
-    password: "lobos2026",
-    teamName: "Esquadrão Lobos do Sertão",
+    id: "t-csa",
+    teamCode: "CSA",
+    password: "CSA2017*",
+    teamName: "Comando Sertão Airsoft",
   },
   {
-    id: "t-condor",
-    teamCode: "CONDOR-02",
-    password: "condor2026",
-    teamName: "Equipe Condor Tático",
+    id: "t-dec",
+    teamCode: "DEC",
+    password: "DEC2020*",
+    teamName: "Divisão Especial de Combate",
   },
   {
-    id: "t-scorpio",
-    teamCode: "SCORPIO-03",
-    password: "scorpio2026",
+    id: "t-cans",
+    teamCode: "CANS",
+    password: "CANS2019",
     teamName: "Esquadrão Scorpio",
   },
 ];
