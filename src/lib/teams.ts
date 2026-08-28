@@ -114,6 +114,30 @@ export function createTeam(
 }
 
 /**
+ * Lets a team rename itself (called from the team's own session-gated
+ * Ficha da Equipe, not the admin area) — unlike createTeam/removeTeam this
+ * is self-service, scoped to the team's own id, and only ever touches
+ * `teamName` (never the login code or password).
+ */
+export function updateTeamName(
+  teamId: string,
+  teamName: string
+): { ok: true; team: Team } | { ok: false; error: string } {
+  const trimmed = teamName.trim();
+  if (!trimmed) {
+    return { ok: false, error: "Informe o nome da equipe." };
+  }
+
+  const team = TEAMS.find((t) => t.id === teamId);
+  if (!team) {
+    return { ok: false, error: "Equipe não encontrada." };
+  }
+
+  team.teamName = trimmed.slice(0, 120);
+  return { ok: true, team };
+}
+
+/**
  * Removes a team login by id. Does NOT cascade to that team's roster or
  * agenda data — see the module header comment above.
  */

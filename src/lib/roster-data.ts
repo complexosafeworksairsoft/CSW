@@ -112,6 +112,40 @@ export function addOperator(
   return { ok: true, operator };
 }
 
+export type UpdateOperatorInput = {
+  photo?: string | null;
+  name: string;
+  tag: string;
+  startMonth: string;
+  category: string;
+};
+
+/**
+ * Updates an existing operator's own fields (scoped to the team — a team
+ * can never edit another team's operator). `photo` is only overwritten when
+ * explicitly present in the input (a new upload); omit it to keep the
+ * operator's current photo, same convention as updateTeamProfile().
+ */
+export function updateOperator(
+  teamId: string,
+  operatorId: string,
+  input: UpdateOperatorInput
+): { ok: true; operator: Operator } | { ok: false; error: string } {
+  const operator = getOperatorForTeam(teamId, operatorId);
+  if (!operator) {
+    return { ok: false, error: "Operador não encontrado." };
+  }
+
+  if (input.photo !== undefined) operator.photo = input.photo;
+  operator.name = input.name;
+  operator.tag = input.tag;
+  operator.startMonth = input.startMonth;
+  operator.category = input.category;
+  touchOperator(operator.id);
+
+  return { ok: true, operator };
+}
+
 /** Removes an operator (scoped to the team) and cascades to their equipamentos. */
 export function removeOperator(teamId: string, operatorId: string): void {
   const idx = OPERATORS.findIndex((o) => o.id === operatorId && o.teamId === teamId);

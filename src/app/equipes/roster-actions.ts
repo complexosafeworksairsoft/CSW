@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { readSessionTeamId } from "@/lib/session";
 import { readPhotoUpload } from "@/lib/photo-upload";
+import { updateTeamName } from "@/lib/teams";
 import {
   addEquipment,
   addOperator,
@@ -11,6 +12,7 @@ import {
   removeEquipment,
   removeOperator,
   setOperatorPublic,
+  updateOperator,
   updateTeamProfile,
 } from "@/lib/roster-data";
 
@@ -39,6 +41,12 @@ export async function updateTeamProfileAction(
     return { error: photoResult.message, resetToken: prevState.resetToken };
   }
 
+  const teamName = String(formData.get("teamName") ?? "").trim();
+  const nameResult = updateTeamName(teamId, teamName);
+  if (!nameResult.ok) {
+    return { error: nameResult.error, resetToken: prevState.resetToken };
+  }
+
   const foundedDateRaw = String(formData.get("foundedDate") ?? "").trim();
   const eventsOrg = String(formData.get("eventsOrg") ?? "")
     .trim()
@@ -51,6 +59,9 @@ export async function updateTeamProfileAction(
   });
 
   revalidatePath(FICHA_PATH);
+  // Team name shows up on the public Operadores directory too (static page),
+  // so a rename needs an explicit bust there, not just on the ficha itself.
+  revalidatePath("/operadores");
   return { error: null, resetToken: prevState.resetToken + 1 };
 }
 
@@ -95,6 +106,55 @@ export async function addOperatorAction(
   }
 
   revalidatePath(FICHA_PATH);
+  return { error: null, resetToken: prevState.resetToken + 1 };
+}
+
+export async function updateOperatorAction(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const teamId = await readSessionTeamId();
+  if (!teamId) {
+    redirect("/equipes/login");
+  }
+
+  const operatorId = String(formData.get("operatorId") ?? "");
+  const operator = getOperatorForTeam(teamId, operatorId);
+  if (!operator) {
+    return { error: "Operador não encontrado.", resetToken: prevState.resetToken };
+  }
+
+  const photoResult = await readPhotoUpload(formData.get("photo"));
+  if (photoResult.kind === "error") {
+    return { error: photoResult.message, resetToken: prevState.resetToken };
+  }
+
+  const name = String(formData.get("name") ?? "").trim();
+  const tag = String(formData.get("tag") ?? "").trim();
+  const startMonth = String(formData.get("startMonth") ?? "").trim();
+  const category = String(formData.get("category") ?? "").trim();
+
+  if (!name || !tag) {
+    return {
+      error: "Informe ao menos o nome e a TAG do operador.",
+      resetToken: prevState.resetToken,
+    };
+  }
+
+  const result = updateOperator(teamId, operator.id, {
+    ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri } : {}),
+    name: name.slice(0, 120),
+    tag: tag.slice(0, 40),
+    startMonth: startMonth.slice(0, 7),
+    category: category.slice(0, 80),
+  });
+
+  if (!result.ok) {
+    return { error: result.error, resetToken: prevState.resetToken };
+  }
+
+  revalidatePath(FICHA_PATH);
+  revalidatePath("/operadores");
   return { error: null, resetToken: prevState.resetToken + 1 };
 }
 

@@ -30,15 +30,20 @@ export default function TeamProfileForm({
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <span className="font-mono-safe text-xs uppercase tracking-widest text-ink-soft">
+            <label
+              htmlFor="teamName"
+              className="font-mono-safe text-xs uppercase tracking-widest text-ink-soft"
+            >
               Nome da equipe
-            </span>
-            <p className="mt-2 font-display text-lg font-semibold text-ink">
-              {teamName}
-            </p>
-            <p className="mt-1 text-xs text-muted">
-              Definido no cadastro da equipe — não é editável por aqui.
-            </p>
+            </label>
+            <input
+              id="teamName"
+              name="teamName"
+              type="text"
+              required
+              defaultValue={teamName}
+              className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 font-display text-lg font-semibold text-ink focus:border-accent focus:outline-none"
+            />
           </div>
 
           <div>
