@@ -15,8 +15,8 @@ const KIND_LABEL: Record<string, string> = {
   comunicado: "Comunicado interno",
 };
 
-export default function EquipesConteudoPage() {
-  const items = getContentSorted();
+export default async function EquipesConteudoPage() {
+  const items = await getContentSorted();
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">

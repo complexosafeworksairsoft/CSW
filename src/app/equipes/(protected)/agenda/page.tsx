@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { readSessionTeamId } from "@/lib/session";
-import { MATCHES } from "@/lib/agenda-data";
+import { getMatches } from "@/lib/agenda-data";
 import { confirmPresenceAction } from "../../actions";
 
 export const metadata: Metadata = {
@@ -14,7 +14,8 @@ function formatDate(iso: string) {
 
 export default async function EquipesAgendaPage() {
   const teamId = (await readSessionTeamId())!;
-  const matches = [...MATCHES].sort((a, b) => (a.date < b.date ? -1 : 1));
+  const allMatches = await getMatches();
+  const matches = [...allMatches].sort((a, b) => (a.date < b.date ? -1 : 1));
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">

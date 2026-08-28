@@ -42,7 +42,7 @@ export async function updateTeamProfileAction(
   }
 
   const teamName = String(formData.get("teamName") ?? "").trim();
-  const nameResult = updateTeamName(teamId, teamName);
+  const nameResult = await updateTeamName(teamId, teamName);
   if (!nameResult.ok) {
     return { error: nameResult.error, resetToken: prevState.resetToken };
   }
@@ -52,7 +52,7 @@ export async function updateTeamProfileAction(
     .trim()
     .slice(0, 2000);
 
-  updateTeamProfile(teamId, {
+  await updateTeamProfile(teamId, {
     ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri } : {}),
     foundedDate: foundedDateRaw || null,
     eventsOrg,
@@ -92,7 +92,7 @@ export async function addOperatorAction(
     };
   }
 
-  const result = addOperator(teamId, {
+  const result = await addOperator(teamId, {
     photo: photoResult.kind === "ok" ? photoResult.dataUri : null,
     name: name.slice(0, 120),
     tag: tag.slice(0, 40),
@@ -119,7 +119,7 @@ export async function updateOperatorAction(
   }
 
   const operatorId = String(formData.get("operatorId") ?? "");
-  const operator = getOperatorForTeam(teamId, operatorId);
+  const operator = await getOperatorForTeam(teamId, operatorId);
   if (!operator) {
     return { error: "Operador não encontrado.", resetToken: prevState.resetToken };
   }
@@ -141,7 +141,7 @@ export async function updateOperatorAction(
     };
   }
 
-  const result = updateOperator(teamId, operator.id, {
+  const result = await updateOperator(teamId, operator.id, {
     ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri } : {}),
     name: name.slice(0, 120),
     tag: tag.slice(0, 40),
@@ -166,7 +166,7 @@ export async function removeOperatorAction(formData: FormData): Promise<void> {
 
   const operatorId = String(formData.get("operatorId") ?? "");
   if (operatorId) {
-    removeOperator(teamId, operatorId);
+    await removeOperator(teamId, operatorId);
   }
 
   revalidatePath(FICHA_PATH);
@@ -182,7 +182,7 @@ export async function addEquipmentAction(
   }
 
   const operatorId = String(formData.get("operatorId") ?? "");
-  const operator = getOperatorForTeam(teamId, operatorId);
+  const operator = await getOperatorForTeam(teamId, operatorId);
   if (!operator) {
     return { error: "Operador não encontrado.", resetToken: prevState.resetToken };
   }
@@ -206,7 +206,7 @@ export async function addEquipmentAction(
     };
   }
 
-  const result = addEquipment(operator.id, {
+  const result = await addEquipment(operator.id, {
     photo: photoResult.kind === "ok" ? photoResult.dataUri : null,
     name: name.slice(0, 120),
     brand: brand.slice(0, 80),
@@ -229,9 +229,9 @@ export async function removeEquipmentAction(formData: FormData): Promise<void> {
 
   const operatorId = String(formData.get("operatorId") ?? "");
   const equipmentId = String(formData.get("equipmentId") ?? "");
-  const operator = getOperatorForTeam(teamId, operatorId);
+  const operator = await getOperatorForTeam(teamId, operatorId);
   if (operator && equipmentId) {
-    removeEquipment(operator.id, equipmentId);
+    await removeEquipment(operator.id, equipmentId);
   }
 
   revalidatePath(FICHA_PATH);
@@ -253,7 +253,7 @@ export async function togglePublicAction(formData: FormData): Promise<void> {
   const operatorId = String(formData.get("operatorId") ?? "");
   const nextIsPublic = formData.get("nextIsPublic") === "true";
   if (operatorId) {
-    setOperatorPublic(teamId, operatorId, nextIsPublic);
+    await setOperatorPublic(teamId, operatorId, nextIsPublic);
   }
 
   revalidatePath(FICHA_PATH);

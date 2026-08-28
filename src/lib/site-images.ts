@@ -1,18 +1,32 @@
-// Prototype data store for the site-wide image admin: a single source of
-// truth listing every placeholder photo slot across the public site (Nav
-// logo included) plus the in-memory values uploaded for them. Same
-// prototype-grade pattern as roster-data.ts / agenda-data.ts: module-level
-// state mutated directly from Server Actions.
+// Site-wide image admin: a single source of truth listing every placeholder
+// photo slot across the public site (Nav logo included) plus the uploaded
+// photo saved for each slot.
 //
-// TODO (production): replace this module-level Map with real object storage
-// (e.g. Supabase Storage), persisting only the resulting URL against a real
-// table instead of the base64 data URI kept in memory here. This mock:
-//   - is NOT persisted and resets whenever the server restarts
-//   - is NOT safe for multiple server instances
-//   - stores photos as base64 data URIs in memory (see the TODO in
-//     src/lib/photo-upload.ts) instead of URLs pointing at real object
-//     storage — that alone is reason enough to not use this in production,
-//     since a handful of photos can bloat server memory significantly
+// SITE_IMAGE_SLOTS below is static configuration (not data) and stays a
+// plain in-code constant. Only the actual uploaded photo per slot is
+// backed by Supabase (see supabase/schema.sql for the `site_images` table)
+// — replaced the earlier in-memory Map, which reset on every server restart
+// and was inconsistent across Vercel's serverless instances.
+//
+// TODO (production): photos are still stored as base64 data URIs (now in a
+// `text` column instead of in memory) instead of URLs pointing at real
+// object storage (e.g. Supabase Storage) — see the TODO in
+// src/lib/photo-upload.ts. That's inherited from the old in-memory version,
+// not fixed in this pass — a handful of photos can still bloat row/network
+// size significantly; swapping it for real object storage is a separate,
+// larger change.
+
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { supabase } from "./supabase";
+
+// supabase() (src/lib/supabase.ts) is typed as `ReturnType<typeof createClient>`
+// without a generated Database type, which — through a TypeScript quirk in how
+// ReturnType resolves createClient's generics — makes every .insert()/.update()/
+// .upsert() call type-error as accepting `never`. Re-asserting the client type
+// here (this module only) sidesteps that without touching supabase.ts.
+function db(): SupabaseClient {
+  return supabase() as SupabaseClient;
+}
 
 export type Ratio = "video" | "square" | "portrait" | "wide";
 
@@ -63,23 +77,38 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
 
 const SLOT_KEYS = new Set(SITE_IMAGE_SLOTS.map((s) => s.key));
 
-const SITE_IMAGES = new Map<string, string>(); // slot key -> base64 data URI
+type SiteImageRow = {
+  slot_key: string;
+  photo: string;
+};
 
 export function isKnownSiteImageSlot(key: string): boolean {
   return SLOT_KEYS.has(key);
 }
 
 /** Returns the saved photo (data URI) for a slot, or null if none was uploaded yet. */
-export function getSiteImage(key: string): string | null {
-  return SITE_IMAGES.get(key) ?? null;
+export async function getSiteImage(key: string): Promise<string | null> {
+  const { data, error } = await db()
+    .from("site_images")
+    .select("photo")
+    .eq("slot_key", key)
+    .maybeSingle<SiteImageRow>();
+
+  if (error || !data) return null;
+  return data.photo;
 }
 
 /** Saves a photo for a known slot. No-op (never silently creates new slots) if the key isn't in SITE_IMAGE_SLOTS. */
-export function setSiteImage(key: string, dataUri: string): void {
+export async function setSiteImage(key: string, dataUri: string): Promise<void> {
   if (!isKnownSiteImageSlot(key)) return;
-  SITE_IMAGES.set(key, dataUri);
+  await db()
+    .from("site_images")
+    .upsert(
+      { slot_key: key, photo: dataUri, updated_at: new Date().toISOString() },
+      { onConflict: "slot_key" }
+    );
 }
 
-export function clearSiteImage(key: string): void {
-  SITE_IMAGES.delete(key);
+export async function clearSiteImage(key: string): Promise<void> {
+  await db().from("site_images").delete().eq("slot_key", key);
 }

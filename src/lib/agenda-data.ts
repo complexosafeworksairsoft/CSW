@@ -1,10 +1,21 @@
-// Prototype data store for the team portal agenda.
+// Server-only module for the team portal agenda.
 //
-// TODO (production): replace this module-level array with real queries
-// against a database (Supabase, per the project brief). This mock version
-// mutates an in-memory array directly from a Server Action, which is only
-// acceptable for a prototype — it is NOT persisted and resets whenever the
-// server restarts, and it is NOT safe for multiple server instances.
+// Backed by Supabase (see supabase/schema.sql for the `matches` and
+// `match_confirmations` tables) — replaced the earlier in-memory array,
+// which reset on every server restart and was inconsistent across Vercel's
+// serverless instances.
+
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { supabase } from "./supabase";
+
+// supabase() (src/lib/supabase.ts) is typed as `ReturnType<typeof createClient>`
+// without a generated Database type, which — through a TypeScript quirk in how
+// ReturnType resolves createClient's generics — makes every .insert()/.update()/
+// .upsert() call type-error as accepting `never`. Re-asserting the client type
+// here (this module only) sidesteps that without touching supabase.ts.
+function db(): SupabaseClient {
+  return supabase() as SupabaseClient;
+}
 
 export type MatchEvent = {
   id: string;
@@ -17,63 +28,93 @@ export type MatchEvent = {
   confirmedTeamIds: string[];
 };
 
-export const MATCHES: MatchEvent[] = [
-  {
-    id: "op-2026-09-06",
-    date: "2026-09-06",
-    time: "08:00",
-    title: "Operação Exemplo",
-    operationType: "CQB — Cerco e resgate",
-    location: "Setor 2, Complexo Safe Works",
-    notes: "Chegada 30min antes para briefing e checagem de equipamento.",
-    confirmedTeamIds: ["t-dec"],
-  },
-  {
-    id: "op-2026-09-20",
-    date: "2026-09-20",
-    time: "14:00",
-    title: "Operação Exemplo 2",
-    operationType: "Campo aberto — Domínio de bandeira",
-    location: "Setor 1 (Trilha Norte), Complexo Safe Works",
-    confirmedTeamIds: [],
-  },
-  {
-    id: "op-2026-10-04",
-    date: "2026-10-04",
-    time: "08:00",
-    title: "Operação Exemplo 3",
-    operationType: "Milsim — 6 horas",
-    location: "Setores 1, 2 e 3, Complexo Safe Works",
-    notes: "Evento longo. Levar hidratação extra e réplica secundária, se houver.",
-    confirmedTeamIds: ["t-csa", "t-cans"],
-  },
-  {
-    id: "op-2026-10-18",
-    date: "2026-10-18",
-    time: "19:00",
-    title: "Operação Exemplo 4",
-    operationType: "Noturno — Infiltração",
-    location: "Setor 2, Complexo Safe Works",
-    notes: "Uso de iluminação tática obrigatório. Regras específicas no briefing.",
-    confirmedTeamIds: [],
-  },
-];
+type MatchRow = {
+  id: string;
+  date: string;
+  time: string;
+  title: string;
+  operation_type: string;
+  location: string;
+  notes: string | null;
+};
 
-export function isTeamConfirmed(matchId: string, teamId: string): boolean {
-  const match = MATCHES.find((m) => m.id === matchId);
-  return match ? match.confirmedTeamIds.includes(teamId) : false;
+type MatchConfirmationRow = {
+  match_id: string;
+  team_id: string;
+};
+
+function rowToMatch(row: MatchRow, confirmedTeamIds: string[]): MatchEvent {
+  return {
+    id: row.id,
+    date: row.date,
+    time: row.time,
+    title: row.title,
+    operationType: row.operation_type,
+    location: row.location,
+    notes: row.notes ?? undefined,
+    confirmedTeamIds,
+  };
+}
+
+/** All matches on the agenda, each with its confirmed team ids, sorted by date ascending. */
+export async function getMatches(): Promise<MatchEvent[]> {
+  const [{ data: matches, error: matchesError }, { data: confirmations, error: confirmationsError }] =
+    await Promise.all([
+      db()
+        .from("matches")
+        .select("*")
+        .order("date", { ascending: true })
+        .returns<MatchRow[]>(),
+      db().from("match_confirmations").select("match_id, team_id").returns<MatchConfirmationRow[]>(),
+    ]);
+
+  if (matchesError || !matches) return [];
+
+  const confirmedByMatch = new Map<string, string[]>();
+  if (!confirmationsError && confirmations) {
+    for (const row of confirmations) {
+      const list = confirmedByMatch.get(row.match_id);
+      if (list) {
+        list.push(row.team_id);
+      } else {
+        confirmedByMatch.set(row.match_id, [row.team_id]);
+      }
+    }
+  }
+
+  return matches.map((row) => rowToMatch(row, confirmedByMatch.get(row.id) ?? []));
+}
+
+export async function isTeamConfirmed(matchId: string, teamId: string): Promise<boolean> {
+  const { data } = await db()
+    .from("match_confirmations")
+    .select("match_id")
+    .eq("match_id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+
+  return !!data;
 }
 
 /** Toggles the given team's confirmation for a match. Returns the new state, or null if the match doesn't exist. */
-export function toggleConfirmation(matchId: string, teamId: string): boolean | null {
-  const match = MATCHES.find((m) => m.id === matchId);
+export async function toggleConfirmation(matchId: string, teamId: string): Promise<boolean | null> {
+  const { data: match } = await db()
+    .from("matches")
+    .select("id")
+    .eq("id", matchId)
+    .maybeSingle();
   if (!match) return null;
 
-  const idx = match.confirmedTeamIds.indexOf(teamId);
-  if (idx >= 0) {
-    match.confirmedTeamIds.splice(idx, 1);
+  const alreadyConfirmed = await isTeamConfirmed(matchId, teamId);
+  if (alreadyConfirmed) {
+    await db()
+      .from("match_confirmations")
+      .delete()
+      .eq("match_id", matchId)
+      .eq("team_id", teamId);
     return false;
   }
-  match.confirmedTeamIds.push(teamId);
+
+  await db().from("match_confirmations").insert({ match_id: matchId, team_id: teamId });
   return true;
 }

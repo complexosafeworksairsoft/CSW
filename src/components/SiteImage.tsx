@@ -19,12 +19,12 @@ type SiteImageProps = {
  * separate, always-empty copy of the store. See src/components/Nav.tsx for
  * how the logo slot works around that.
  */
-export default function SiteImage({
+export default async function SiteImage({
   slotKey,
   label,
   ratio = "square",
   className = "",
 }: SiteImageProps) {
-  const photo = getSiteImage(slotKey);
+  const photo = await getSiteImage(slotKey);
   return <PhotoTile photo={photo} label={label} ratio={ratio} className={className} />;
 }

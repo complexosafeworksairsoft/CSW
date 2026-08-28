@@ -1,32 +1,18 @@
 // Server-only module: only ever imported from Server Components / Server
-// Actions (it uses plaintext passwords, so it must never reach the client
-// bundle). Not marked with the `server-only` package because that package
-// isn't installed and this prototype avoids adding new dependencies — the
-// import graph below (next/headers, node:crypto users) already keeps it
-// out of client bundles.
+// Actions (it handles plaintext passwords, so it must never reach the
+// client bundle). Not marked with the `server-only` package because that
+// package isn't installed and this project avoids adding dependencies where
+// avoidable — the import graph below (supabase.ts, next/headers users)
+// already keeps it out of client bundles.
 //
-// `TEAMS` starts seeded with 3 demo entries but is admin-mutable at runtime
-// via createTeam()/removeTeam() below, called from
-// src/app/equipes/admin/team-actions.ts — only the site owner (gated by the
-// separate admin session, not a team's own session) can create or remove a
-// team access from /equipes/admin. Like roster-data.ts/agenda-data.ts, this
-// is a module-level array: NOT persisted, resets on server restart, and not
-// safe across multiple server instances.
+// Backed by Supabase (see supabase/schema.sql for the `teams` table) —
+// replaced the earlier in-memory array, which reset on every server restart
+// and was inconsistent across Vercel's serverless instances.
 //
-// Known prototype limitation: removeTeam() only removes the login entry
-// here. It does NOT cascade-delete that team's data in roster-data.ts
-// (TeamProfile/Operators/Equipment) or agenda-data.ts (agenda
-// confirmations) — that data is left behind, orphaned under a teamId that
-// no longer has a login. Cascading the delete is out of scope for now; a
-// production version would need to decide (and probably ask the admin)
-// whether removing a team's access should also wipe its roster/agenda data.
-//
-// TODO (production): this in-memory list is a PROTOTYPE ONLY stand-in for a
-// real database. Before onboarding real teams, replace it with a proper
-// table (the project brief points at Supabase) and hashed passwords
-// (bcrypt/argon2 — never store or compare plaintext). Team accounts should
-// still be created manually by the Complexo's admin, not via public
-// self-signup, per the product decision behind this feature.
+// TODO (production): passwords are still stored/compared as plaintext.
+// Before onboarding real teams, hash them (bcrypt/argon2) instead.
+
+import { supabase } from "./supabase";
 
 export type Team = {
   id: string;
@@ -35,44 +21,75 @@ export type Team = {
   teamName: string;
 };
 
-export const TEAMS: Team[] = [
-  {
-    id: "t-csa",
-    teamCode: "CSA",
-    password: "CSA2017*",
-    teamName: "Comando Sertão Airsoft",
-  },
-  {
-    id: "t-dec",
-    teamCode: "DEC",
-    password: "DEC2020*",
-    teamName: "Divisão Especial de Combate",
-  },
-  {
-    id: "t-cans",
-    teamCode: "CANS",
-    password: "CANS2019",
-    teamName: "Esquadrão Scorpio",
-  },
-];
+type TeamRow = {
+  id: string;
+  team_code: string;
+  password: string;
+  team_name: string;
+};
 
-let nextIdCounter = 1;
-function generateId(prefix: string): string {
-  return `${prefix}-${Date.now().toString(36)}-${(nextIdCounter++).toString(36)}`;
+function rowToTeam(row: TeamRow): Team {
+  return {
+    id: row.id,
+    teamCode: row.team_code,
+    password: row.password,
+    teamName: row.team_name,
+  };
 }
 
-export function findTeamByCredentials(
+function generateId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+export async function findTeamByCredentials(
   teamCode: string,
   password: string
-): Team | null {
+): Promise<Team | null> {
   const normalized = teamCode.trim().toUpperCase();
-  const team = TEAMS.find((t) => t.teamCode === normalized);
-  if (!team || team.password !== password) return null;
-  return team;
+  const { data, error } = await supabase()
+    .from("teams")
+    .select("*")
+    .eq("team_code", normalized)
+    .maybeSingle<TeamRow>();
+
+  if (error || !data || data.password !== password) return null;
+  return rowToTeam(data);
 }
 
-export function findTeamById(id: string): Team | null {
-  return TEAMS.find((t) => t.id === id) ?? null;
+export async function findTeamById(id: string): Promise<Team | null> {
+  if (!id) return null;
+  const { data, error } = await supabase()
+    .from("teams")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle<TeamRow>();
+
+  if (error || !data) return null;
+  return rowToTeam(data);
+}
+
+/** Looks up a team by its login code (case-insensitive) — the public-facing identifier used in /operadores/equipe/[teamCode] URLs. */
+export async function findTeamByCode(teamCode: string): Promise<Team | null> {
+  const normalized = teamCode.trim().toUpperCase();
+  const { data, error } = await supabase()
+    .from("teams")
+    .select("*")
+    .eq("team_code", normalized)
+    .maybeSingle<TeamRow>();
+
+  if (error || !data) return null;
+  return rowToTeam(data);
+}
+
+export async function getAllTeams(): Promise<Team[]> {
+  const { data, error } = await supabase()
+    .from("teams")
+    .select("*")
+    .order("team_name", { ascending: true })
+    .returns<TeamRow[]>();
+
+  if (error || !data) return [];
+  return data.map(rowToTeam);
 }
 
 export type CreateTeamInput = {
@@ -88,9 +105,9 @@ export type CreateTeamInput = {
  * attempt (trimmed, uppercased) so the two stay consistent, and duplicate
  * codes are rejected case-insensitively.
  */
-export function createTeam(
+export async function createTeam(
   input: CreateTeamInput
-): { ok: true; team: Team } | { ok: false; error: string } {
+): Promise<{ ok: true; team: Team } | { ok: false; error: string }> {
   const teamCode = input.teamCode.trim().toUpperCase();
   const password = input.password.trim();
   const teamName = input.teamName.trim();
@@ -99,17 +116,26 @@ export function createTeam(
     return { ok: false, error: "Preencha nome, código e senha da equipe." };
   }
 
-  if (TEAMS.some((t) => t.teamCode === teamCode)) {
+  const { data: dup } = await supabase()
+    .from("teams")
+    .select("id")
+    .eq("team_code", teamCode)
+    .maybeSingle();
+  if (dup) {
     return { ok: false, error: "Já existe uma equipe com esse código." };
   }
 
-  const team: Team = {
-    id: generateId("t"),
-    teamCode,
-    password,
-    teamName,
-  };
-  TEAMS.push(team);
+  const team: Team = { id: generateId("t"), teamCode, password, teamName };
+  const { error } = await supabase().from("teams").insert({
+    id: team.id,
+    team_code: team.teamCode,
+    password: team.password,
+    team_name: team.teamName,
+  });
+
+  if (error) {
+    return { ok: false, error: "Não foi possível criar a equipe. Tente novamente." };
+  }
   return { ok: true, team };
 }
 
@@ -119,30 +145,34 @@ export function createTeam(
  * is self-service, scoped to the team's own id, and only ever touches
  * `teamName` (never the login code or password).
  */
-export function updateTeamName(
+export async function updateTeamName(
   teamId: string,
   teamName: string
-): { ok: true; team: Team } | { ok: false; error: string } {
+): Promise<{ ok: true; team: Team } | { ok: false; error: string }> {
   const trimmed = teamName.trim();
   if (!trimmed) {
     return { ok: false, error: "Informe o nome da equipe." };
   }
 
-  const team = TEAMS.find((t) => t.id === teamId);
-  if (!team) {
+  const { data, error } = await supabase()
+    .from("teams")
+    .update({ team_name: trimmed.slice(0, 120) })
+    .eq("id", teamId)
+    .select("*")
+    .maybeSingle<TeamRow>();
+
+  if (error || !data) {
     return { ok: false, error: "Equipe não encontrada." };
   }
-
-  team.teamName = trimmed.slice(0, 120);
-  return { ok: true, team };
+  return { ok: true, team: rowToTeam(data) };
 }
 
 /**
- * Removes a team login by id. Does NOT cascade to that team's roster or
- * agenda data — see the module header comment above.
+ * Removes a team login by id. Cascades in the database (see
+ * `references teams(id) on delete cascade` in supabase/schema.sql) to that
+ * team's profile, operators, equipment, and agenda confirmations — unlike
+ * the old in-memory version, this one DOES clean up related data.
  */
-export function removeTeam(teamId: string): void {
-  const idx = TEAMS.findIndex((t) => t.id === teamId);
-  if (idx === -1) return;
-  TEAMS.splice(idx, 1);
+export async function removeTeam(teamId: string): Promise<void> {
+  await supabase().from("teams").delete().eq("id", teamId);
 }

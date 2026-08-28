@@ -40,10 +40,10 @@ export const metadata: Metadata = {
     "Complexo Safe Works: campo de jogo, oficina de manutenção, loja e treinamentos táticos de airsoft em Mossoró/RN.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Read here (a Server Component) rather than inside Nav.tsx (a Client
   // Component) — see the note in Nav.tsx for why.
-  const logoPhoto = getSiteImage("nav.logo");
+  const logoPhoto = await getSiteImage("nav.logo");
 
   return (
     <html

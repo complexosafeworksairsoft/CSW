@@ -12,13 +12,16 @@ export const metadata: Metadata = {
 export default async function FichaPage() {
   // Layout above already guarantees a valid session + team.
   const teamId = (await readSessionTeamId())!;
-  const team = findTeamById(teamId)!;
+  const team = (await findTeamById(teamId))!;
 
-  const profile = getTeamProfile(teamId);
-  const operators = getOperators(teamId).map((operator) => ({
-    ...operator,
-    equipment: getEquipment(operator.id),
-  }));
+  const profile = await getTeamProfile(teamId);
+  const rosterOperators = await getOperators(teamId);
+  const operators = await Promise.all(
+    rosterOperators.map(async (operator) => ({
+      ...operator,
+      equipment: await getEquipment(operator.id),
+    }))
+  );
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">

@@ -32,7 +32,7 @@ export async function createTeamAction(
   const password = String(formData.get("password") ?? "");
   const teamName = String(formData.get("teamName") ?? "");
 
-  const result = createTeam({ teamCode, password, teamName });
+  const result = await createTeam({ teamCode, password, teamName });
   if (!result.ok) {
     return { error: result.error, resetToken: prevState.resetToken, created: null };
   }
@@ -57,7 +57,7 @@ export async function removeTeamAction(formData: FormData): Promise<void> {
 
   const teamId = String(formData.get("teamId") ?? "");
   if (teamId) {
-    removeTeam(teamId);
+    await removeTeam(teamId);
   }
 
   revalidatePath(ADMIN_PATH);

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { readSessionTeamId } from "@/lib/session";
 import { findTeamById } from "@/lib/teams";
-import { MATCHES } from "@/lib/agenda-data";
+import { getMatches } from "@/lib/agenda-data";
 import { getContentSorted } from "@/lib/conteudo-data";
 
 export const metadata: Metadata = {
@@ -17,17 +17,19 @@ function formatDate(iso: string) {
 export default async function EquipesDashboardPage() {
   // Layout above already guarantees a valid session + team.
   const teamId = (await readSessionTeamId())!;
-  const team = findTeamById(teamId)!;
+  const team = (await findTeamById(teamId))!;
 
+  const matches = await getMatches();
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = MATCHES.filter((m) => m.date >= today).sort((a, b) =>
+  const upcoming = matches.filter((m) => m.date >= today).sort((a, b) =>
     a.date < b.date ? -1 : 1
   );
   const nextMatch = upcoming[0];
-  const confirmedCount = MATCHES.filter((m) =>
+  const confirmedCount = matches.filter((m) =>
     m.confirmedTeamIds.includes(teamId)
   ).length;
-  const latestContent = getContentSorted().slice(0, 2);
+  const content = await getContentSorted();
+  const latestContent = content.slice(0, 2);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -75,7 +77,7 @@ export default async function EquipesDashboardPage() {
             {confirmedCount === 1 ? "operação confirmada" : "operações confirmadas"}
           </h2>
           <p className="mt-2 text-sm text-ink-soft">
-            Do total de {MATCHES.length} operações na agenda atual.
+            Do total de {matches.length} operações na agenda atual.
           </p>
           <span className="mt-4 inline-block text-sm font-medium text-olive-deep group-hover:text-accent">
             Confirmar presença →

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { readAdminSession } from "@/lib/admin-session";
 import { getSiteImage, SITE_IMAGE_SLOTS } from "@/lib/site-images";
-import { TEAMS } from "@/lib/teams";
+import { getAllTeams } from "@/lib/teams";
 import { logoutAdminAction } from "../admin-actions";
 import AdminSlotCard from "./AdminSlotCard";
 import TeamList from "./TeamList";
@@ -36,6 +36,12 @@ export default async function AdminImagesPage() {
   }
 
   const groups = groupSlots();
+  const teams = await getAllTeams();
+
+  const photoEntries = await Promise.all(
+    SITE_IMAGE_SLOTS.map(async (slot) => [slot.key, await getSiteImage(slot.key)] as const)
+  );
+  const photosBySlotKey = new Map(photoEntries);
 
   return (
     <div>
@@ -78,7 +84,7 @@ export default async function AdminImagesPage() {
           </p>
 
           <div className="mt-6">
-            <TeamList teams={TEAMS} />
+            <TeamList teams={teams} />
           </div>
 
           <div className="mt-6">
@@ -95,7 +101,11 @@ export default async function AdminImagesPage() {
               </h2>
               <div className="mt-6 grid gap-6 lg:grid-cols-2">
                 {slots.map((slot) => (
-                  <AdminSlotCard key={slot.key} slot={slot} photo={getSiteImage(slot.key)} />
+                  <AdminSlotCard
+                    key={slot.key}
+                    slot={slot}
+                    photo={photosBySlotKey.get(slot.key) ?? null}
+                  />
                 ))}
               </div>
             </section>

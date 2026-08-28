@@ -4,23 +4,15 @@ import Hero from "@/components/Hero";
 import PhotoTile from "@/components/PhotoTile";
 import ReactionBar from "@/components/ReactionBar";
 import CommentBox from "@/components/CommentBox";
-import { TEAMS } from "@/lib/teams";
+import { findTeamByCode } from "@/lib/teams";
 import { getPublicOperatorsForTeam } from "@/lib/roster-data";
 import { getComments, getReactionCounts } from "@/lib/engagement-data";
 
 type Params = Promise<{ teamCode: string }>;
 
-// teamCode (e.g. "CSA", "DEC", "CANS") is already a public-facing identifier
-// — it's the login *username*, not a secret. The password is the secret,
-// and this page (and everything it imports) never touches passwords.
-function findTeamByCode(teamCode: string) {
-  const normalized = teamCode.trim().toUpperCase();
-  return TEAMS.find((t) => t.teamCode === normalized) ?? null;
-}
-
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { teamCode } = await params;
-  const team = findTeamByCode(teamCode);
+  const team = await findTeamByCode(teamCode);
   return {
     title: team
       ? `${team.teamName} — Operadores | Safe Works`
@@ -30,12 +22,19 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function TeamPublicRosterPage({ params }: { params: Params }) {
   const { teamCode } = await params;
-  const team = findTeamByCode(teamCode);
+  const team = await findTeamByCode(teamCode);
   if (!team) {
     notFound();
   }
 
-  const operators = getPublicOperatorsForTeam(team.id);
+  const publicOperators = await getPublicOperatorsForTeam(team.id);
+  const operators = await Promise.all(
+    publicOperators.map(async (operator) => ({
+      operator,
+      counts: await getReactionCounts(operator.id),
+      comments: await getComments(operator.id),
+    }))
+  );
 
   return (
     <>
@@ -54,7 +53,7 @@ export default async function TeamPublicRosterPage({ params }: { params: Params 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         {operators.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {operators.map((operator) => (
+            {operators.map(({ operator, counts, comments }) => (
               <article key={operator.id} className="bg-surface border border-line p-5 flex flex-col">
                 <div className="flex gap-4">
                   <PhotoTile
@@ -78,11 +77,11 @@ export default async function TeamPublicRosterPage({ params }: { params: Params 
                 <div className="mt-4">
                   <ReactionBar
                     operatorId={operator.id}
-                    counts={getReactionCounts(operator.id)}
+                    counts={counts}
                   />
                 </div>
 
-                <CommentBox operatorId={operator.id} comments={getComments(operator.id)} />
+                <CommentBox operatorId={operator.id} comments={comments} />
               </article>
             ))}
           </div>

@@ -22,7 +22,7 @@ export default async function EquipesProtectedLayout({
     redirect("/equipes/login");
   }
 
-  const team = findTeamById(teamId);
+  const team = await findTeamById(teamId);
   if (!team) {
     // Session cookie points at a team that no longer exists in the seed
     // list (e.g. after editing src/lib/teams.ts) — treat as logged out.

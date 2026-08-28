@@ -19,21 +19,28 @@ export const metadata: Metadata = {
 
 const DESTAQUES_LIMIT = 5;
 
-export default function OperadoresPage() {
+export default async function OperadoresPage() {
   // Only ever reads *Public* operators — this page never touches private
   // roster data, team login codes, or anything from src/lib/teams.ts beyond
   // the team name.
-  const destaques = getRecentPublicOperators(DESTAQUES_LIMIT).map((operator) => ({
-    operator,
-    team: findTeamById(operator.teamId),
-  }));
+  const recentPublicOperators = await getRecentPublicOperators(DESTAQUES_LIMIT);
+  const destaques = await Promise.all(
+    recentPublicOperators.map(async (operator) => ({
+      operator,
+      team: await findTeamById(operator.teamId),
+      counts: await getReactionCounts(operator.id),
+    }))
+  );
 
-  const teams = getTeamsWithPublicOperators()
-    .map(({ teamId, publicCount }) => {
-      const team = findTeamById(teamId);
+  const teamsWithPublicOperators = await getTeamsWithPublicOperators();
+  const teamEntries = await Promise.all(
+    teamsWithPublicOperators.map(async ({ teamId, publicCount }) => {
+      const team = await findTeamById(teamId);
       if (!team) return null;
-      return { team, publicCount, profile: getTeamProfile(teamId) };
+      return { team, publicCount, profile: await getTeamProfile(teamId) };
     })
+  );
+  const teams = teamEntries
     .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
     .sort((a, b) => a.team.teamName.localeCompare(b.team.teamName, "pt-BR"));
 
@@ -57,7 +64,7 @@ export default function OperadoresPage() {
 
         {destaques.length > 0 ? (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-            {destaques.map(({ operator, team }) => (
+            {destaques.map(({ operator, team, counts }) => (
               <div
                 key={operator.id}
                 className="relative border-2 border-accent bg-surface p-4 pt-6 flex flex-col"
@@ -82,7 +89,7 @@ export default function OperadoresPage() {
                 <div className="mt-3">
                   <ReactionBar
                     operatorId={operator.id}
-                    counts={getReactionCounts(operator.id)}
+                    counts={counts}
                   />
                 </div>
               </div>

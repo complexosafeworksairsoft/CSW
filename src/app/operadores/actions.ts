@@ -33,14 +33,15 @@ export type ActionState = {
  * private operator's data (e.g. by someone guessing/reusing an id after a
  * team flips an operator back to private).
  */
-function findPublicOperator(operatorId: string) {
-  return getPublicOperators().find((o) => o.id === operatorId) ?? null;
+async function findPublicOperator(operatorId: string) {
+  const publicOperators = await getPublicOperators();
+  return publicOperators.find((o) => o.id === operatorId) ?? null;
 }
 
 /** Revalidates both the "Destaques" directory page and the operator's team roster page. */
-function revalidateOperatorPages(teamId: string): void {
+async function revalidateOperatorPages(teamId: string): Promise<void> {
   revalidatePath(OPERADORES_PATH);
-  const team = findTeamById(teamId);
+  const team = await findTeamById(teamId);
   if (team) {
     revalidatePath(`/operadores/equipe/${team.teamCode}`);
   }
@@ -50,13 +51,13 @@ export async function reactAction(formData: FormData): Promise<void> {
   const operatorId = String(formData.get("operatorId") ?? "");
   const kindRaw = String(formData.get("kind") ?? "");
 
-  const operator = findPublicOperator(operatorId);
+  const operator = await findPublicOperator(operatorId);
   if (!operator || !isReactionKind(kindRaw)) {
     return;
   }
 
-  addReaction(operator.id, kindRaw);
-  revalidateOperatorPages(operator.teamId);
+  await addReaction(operator.id, kindRaw);
+  await revalidateOperatorPages(operator.teamId);
 }
 
 const COMMENT_TEXT_MAX = 100;
@@ -66,7 +67,7 @@ export async function addCommentAction(
   formData: FormData
 ): Promise<ActionState> {
   const operatorId = String(formData.get("operatorId") ?? "");
-  const operator = findPublicOperator(operatorId);
+  const operator = await findPublicOperator(operatorId);
   if (!operator) {
     return { error: "Operador não encontrado.", resetToken: prevState.resetToken };
   }
@@ -90,7 +91,7 @@ export async function addCommentAction(
   const isAdmin = await readAdminSession();
   const authorName = isAdmin ? "Allis" : null;
 
-  addComment(operator.id, text, authorName);
-  revalidateOperatorPages(operator.teamId);
+  await addComment(operator.id, text, authorName);
+  await revalidateOperatorPages(operator.teamId);
   return { error: null, resetToken: prevState.resetToken + 1 };
 }

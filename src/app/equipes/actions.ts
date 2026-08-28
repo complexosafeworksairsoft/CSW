@@ -21,7 +21,7 @@ export async function loginAction(
     return { error: "Informe o código da equipe e a senha." };
   }
 
-  const team = findTeamByCredentials(teamCode, password);
+  const team = await findTeamByCredentials(teamCode, password);
   if (!team) {
     return { error: "Código de equipe ou senha inválidos." };
   }
@@ -43,7 +43,7 @@ export async function confirmPresenceAction(formData: FormData): Promise<void> {
 
   const matchId = String(formData.get("matchId") ?? "");
   if (matchId) {
-    toggleConfirmation(matchId, teamId);
+    await toggleConfirmation(matchId, teamId);
   }
 
   revalidatePath("/equipes/agenda");

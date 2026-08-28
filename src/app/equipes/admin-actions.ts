@@ -67,7 +67,7 @@ export async function updateSiteImageAction(
     return { error: "Selecione uma imagem para enviar.", resetToken: prevState.resetToken };
   }
 
-  setSiteImage(slotKey, photoResult.dataUri);
+  await setSiteImage(slotKey, photoResult.dataUri);
 
   revalidatePath("/", "layout");
   return { error: null, resetToken: prevState.resetToken + 1 };
@@ -81,7 +81,7 @@ export async function clearSiteImageAction(formData: FormData): Promise<void> {
 
   const slotKey = String(formData.get("slotKey") ?? "");
   if (isKnownSiteImageSlot(slotKey)) {
-    clearSiteImage(slotKey);
+    await clearSiteImage(slotKey);
   }
 
   revalidatePath("/", "layout");
