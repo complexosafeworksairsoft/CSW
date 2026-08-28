@@ -25,7 +25,14 @@ export function findAdminByCredentials(
   username: string,
   password: string
 ): AdminUser | null {
-  if (username !== ADMIN_USER.username || password !== ADMIN_USER.password) {
+  // Trim stray whitespace (mobile autofill/autocomplete sometimes appends a
+  // trailing space) — still an exact, case-sensitive match otherwise.
+  const normalizedUsername = username.trim();
+  const normalizedPassword = password.trim();
+  if (
+    normalizedUsername !== ADMIN_USER.username ||
+    normalizedPassword !== ADMIN_USER.password
+  ) {
     return null;
   }
   return ADMIN_USER;
