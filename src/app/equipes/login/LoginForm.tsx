@@ -25,7 +25,7 @@ export default function LoginForm() {
           autoCapitalize="characters"
           autoCorrect="off"
           spellCheck={false}
-          placeholder="EX: LOBOS-01"
+          placeholder="EX: CSA"
           required
           className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 font-mono-safe text-sm uppercase tracking-widest text-ink placeholder:text-muted focus:border-accent focus:outline-none"
         />
