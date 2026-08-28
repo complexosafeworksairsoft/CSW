@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { readAdminSession } from "@/lib/admin-session";
 import { getSiteImage, SITE_IMAGE_SLOTS } from "@/lib/site-images";
+import { TEAMS } from "@/lib/teams";
 import { logoutAdminAction } from "../admin-actions";
 import AdminSlotCard from "./AdminSlotCard";
+import TeamList from "./TeamList";
+import CreateTeamForm from "./CreateTeamForm";
 
 export const metadata: Metadata = {
   title: "Administração de Imagens | Safe Works",
@@ -63,7 +66,27 @@ export default async function AdminImagesPage() {
           imagem é enviada.
         </p>
 
-        <div className="mt-10 space-y-12">
+        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+          <p className="eyebrow">Equipes</p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
+            Acessos de equipe
+          </h2>
+          <p className="mt-2 text-sm text-ink-soft max-w-2xl">
+            Crie o código e a senha que uma equipe usa para entrar no portal
+            (/equipes/login). Só o administrador do Complexo pode criar ou
+            remover acessos — as equipes não conseguem se cadastrar sozinhas.
+          </p>
+
+          <div className="mt-6">
+            <TeamList teams={TEAMS} />
+          </div>
+
+          <div className="mt-6">
+            <CreateTeamForm />
+          </div>
+        </section>
+
+        <div className="mt-12 space-y-12">
           {groups.map(([group, slots]) => (
             <section key={group}>
               <p className="eyebrow">Seção</p>
