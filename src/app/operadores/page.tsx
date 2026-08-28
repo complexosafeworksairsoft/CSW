@@ -2,12 +2,14 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import Hero from "@/components/Hero";
 import PhotoTile from "@/components/PhotoTile";
+import ReactionBar from "@/components/ReactionBar";
 import { findTeamById } from "@/lib/teams";
 import {
   getRecentPublicOperators,
   getTeamProfile,
   getTeamsWithPublicOperators,
 } from "@/lib/roster-data";
+import { getReactionCounts } from "@/lib/engagement-data";
 
 export const metadata: Metadata = {
   title: "Operadores | Safe Works",
@@ -77,6 +79,12 @@ export default function OperadoresPage() {
                 <p className="mt-1 text-xs text-ink-soft truncate">
                   {team ? team.teamName : "Equipe não encontrada"}
                 </p>
+                <div className="mt-3">
+                  <ReactionBar
+                    operatorId={operator.id}
+                    counts={getReactionCounts(operator.id)}
+                  />
+                </div>
               </div>
             ))}
           </div>
