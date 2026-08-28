@@ -46,6 +46,9 @@ export default function CreateTeamForm() {
             id="team-code"
             name="teamCode"
             type="text"
+            autoCapitalize="characters"
+            autoCorrect="off"
+            spellCheck={false}
             required
             placeholder="Ex: CSA"
             className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 font-mono-safe text-sm uppercase text-ink placeholder:text-muted placeholder:normal-case focus:border-accent focus:outline-none"
@@ -63,6 +66,9 @@ export default function CreateTeamForm() {
             id="team-password"
             name="password"
             type="text"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             required
             className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 font-mono-safe text-sm text-ink focus:border-accent focus:outline-none"
           />

@@ -23,6 +23,8 @@ export default function LoginForm() {
           type="text"
           autoComplete="username"
           autoCapitalize="characters"
+          autoCorrect="off"
+          spellCheck={false}
           placeholder="EX: LOBOS-01"
           required
           className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 font-mono-safe text-sm uppercase tracking-widest text-ink placeholder:text-muted focus:border-accent focus:outline-none"
@@ -41,6 +43,9 @@ export default function LoginForm() {
           name="password"
           type="password"
           autoComplete="current-password"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
           required
           className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
         />

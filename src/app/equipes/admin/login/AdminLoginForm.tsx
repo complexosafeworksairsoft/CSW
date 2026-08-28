@@ -22,6 +22,9 @@ export default function AdminLoginForm() {
           name="username"
           type="text"
           autoComplete="username"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
           placeholder="Usuário"
           required
           className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
@@ -40,6 +43,9 @@ export default function AdminLoginForm() {
           name="password"
           type="password"
           autoComplete="current-password"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
           required
           className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
         />
