@@ -48,7 +48,7 @@ export default function Nav({ logoPhoto }: { logoPhoto: string | null }) {
                 className={`whitespace-nowrap px-2 py-2 text-[13px] font-medium tracking-wide transition-colors lg:px-2.5 lg:text-sm ${
                   active
                     ? "text-accent"
-                    : "text-[#D8D2B8] hover:text-[#F6F2E4]"
+                    : "text-white hover:text-[#F6F2E4]"
                 }`}
               >
                 {link.label}
@@ -87,7 +87,7 @@ export default function Nav({ logoPhoto }: { logoPhoto: string | null }) {
               href={link.href}
               onClick={() => setOpen(false)}
               className={`py-2.5 text-sm font-medium border-b border-[#F0EBDB]/10 ${
-                pathname === link.href ? "text-accent" : "text-[#D8D2B8]"
+                pathname === link.href ? "text-accent" : "text-white"
               }`}
             >
               {link.label}

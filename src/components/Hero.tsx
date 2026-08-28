@@ -33,7 +33,7 @@ export default function Hero({ eyebrow, title, subtitle, actions, image }: HeroP
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">{subtitle}</p>
+            <p className="mt-4 max-w-xl text-lg text-white">{subtitle}</p>
           )}
           {actions && <div className="mt-8 flex flex-wrap gap-3">{actions}</div>}
         </div>

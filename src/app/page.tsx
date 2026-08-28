@@ -50,14 +50,14 @@ export default function Home() {
         />
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
-            <span className="inline-flex items-center gap-2 font-mono-safe text-xs uppercase tracking-widest text-[#D8D2B8] border border-[#F0EBDB]/35 px-3 py-1 rounded-sm">
+            <span className="inline-flex items-center gap-2 font-mono-safe text-xs uppercase tracking-widest text-white border border-[#F0EBDB]/35 px-3 py-1 rounded-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />
               Mossoró / RN
             </span>
             <h1 className="mt-5 font-display text-4xl font-semibold leading-tight sm:text-6xl max-w-2xl text-[#F6F2E4]">
               Complexo Safe Works
             </h1>
-            <p className="mt-4 max-w-xl text-lg text-[#CFC9AE]">
+            <p className="mt-4 max-w-xl text-lg text-white">
               Campo de Jogo, oficina mecânica, equipamentos e treinamentos táticos
               de airsoft reunidos em um único endereço. Jogue, aprenda e
               equipe-se em segurança.

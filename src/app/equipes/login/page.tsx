@@ -26,14 +26,14 @@ export default async function EquipesLoginPage() {
         }}
       />
       <div className="relative mx-auto max-w-md px-4 py-20 sm:px-6 sm:py-28">
-        <span className="inline-flex items-center gap-2 font-mono-safe text-xs uppercase tracking-widest text-[#D8D2B8] border border-[#F0EBDB]/35 px-3 py-1 rounded-sm">
+        <span className="inline-flex items-center gap-2 font-mono-safe text-xs uppercase tracking-widest text-white border border-[#F0EBDB]/35 px-3 py-1 rounded-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-accent" />
           Acesso restrito
         </span>
         <h1 className="mt-5 font-display text-3xl font-semibold leading-tight sm:text-4xl text-[#F6F2E4]">
           Portal de Equipes
         </h1>
-        <p className="mt-3 text-[#CFC9AE]">
+        <p className="mt-3 text-white">
           Entre com o código e a senha da sua equipe para acessar a agenda de
           operações e o conteúdo exclusivo do esquadrão.
         </p>
