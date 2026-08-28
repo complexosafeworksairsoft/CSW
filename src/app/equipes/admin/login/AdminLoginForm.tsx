@@ -20,7 +20,8 @@ export default function AdminLoginForm() {
         <input
           id="code"
           name="code"
-          type="password"
+          type="text"
+          inputMode="text"
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
