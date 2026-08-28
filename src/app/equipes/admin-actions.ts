@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { findAdminByCredentials } from "@/lib/admin";
+import { isValidAdminAccessCode } from "@/lib/admin";
 import { createAdminSession, destroyAdminSession, readAdminSession } from "@/lib/admin-session";
 import { readPhotoUpload } from "@/lib/photo-upload";
 import { isKnownSiteImageSlot, setSiteImage, clearSiteImage } from "@/lib/site-images";
@@ -17,16 +17,14 @@ export async function loginAdminAction(
   _prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
-  const username = String(formData.get("username") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
+  const code = String(formData.get("code") ?? "");
 
-  if (!username || !password) {
-    return { error: "Informe o usuário e a senha." };
+  if (!code.trim()) {
+    return { error: "Informe o código de acesso." };
   }
 
-  const admin = findAdminByCredentials(username, password);
-  if (!admin) {
-    return { error: "Usuário ou senha inválidos." };
+  if (!isValidAdminAccessCode(code)) {
+    return { error: "Código de acesso inválido." };
   }
 
   await createAdminSession();

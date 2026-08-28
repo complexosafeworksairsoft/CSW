@@ -1,39 +1,23 @@
 // Server-only module: only ever imported from Server Components / Server
-// Actions (it uses a plaintext password, so it must never reach the client
-// bundle). Not marked with the `server-only` package because that package
-// isn't installed and this prototype avoids adding new dependencies — the
-// import graph below already keeps it out of client bundles, same as
+// Actions (it uses a plaintext access code, so it must never reach the
+// client bundle). Not marked with the `server-only` package because that
+// package isn't installed and this prototype avoids adding new dependencies
+// — the import graph below already keeps it out of client bundles, same as
 // src/lib/teams.ts.
 //
-// TODO (production): this single hardcoded credential is a PROTOTYPE ONLY
-// stand-in for a real admin-user table. Before going live, replace it with a
-// proper table (the project brief points at Supabase), hashed passwords
-// (bcrypt/argon2 — never store or compare plaintext), and support for more
-// than one admin account.
+// TODO (production): a single shared passcode (no username, no per-admin
+// identity) is a deliberate simplification requested by the client after
+// repeated trouble logging in with a username+password on mobile — it's
+// LESS secure than what this replaced (anyone with the code has full admin
+// access, and there's no way to tell admins apart or revoke just one).
+// Before going live for real, replace this with a proper admin-user table
+// (the project brief points at Supabase) with hashed, individual passwords.
 
-export type AdminUser = {
-  username: string;
-  password: string;
-};
+const ADMIN_ACCESS_CODE = "COMPLEXO2020";
 
-const ADMIN_USER: AdminUser = {
-  username: "Allis",
-  password: "works2020",
-};
-
-export function findAdminByCredentials(
-  username: string,
-  password: string
-): AdminUser | null {
-  // Trim stray whitespace (mobile autofill/autocomplete sometimes appends a
-  // trailing space) — still an exact, case-sensitive match otherwise.
-  const normalizedUsername = username.trim();
-  const normalizedPassword = password.trim();
-  if (
-    normalizedUsername !== ADMIN_USER.username ||
-    normalizedPassword !== ADMIN_USER.password
-  ) {
-    return null;
-  }
-  return ADMIN_USER;
+// Case-insensitive on purpose: the earlier username+password login broke
+// repeatedly on mobile keyboards that silently changed letter casing (see
+// git history). A single code is worth making forgiving about case too.
+export function isValidAdminAccessCode(code: string): boolean {
+  return code.trim().toUpperCase() === ADMIN_ACCESS_CODE;
 }

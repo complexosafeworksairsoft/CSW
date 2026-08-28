@@ -12,42 +12,23 @@ export default function AdminLoginForm() {
     <form action={formAction} className="mt-8 space-y-5">
       <div>
         <label
-          htmlFor="username"
+          htmlFor="code"
           className="font-mono-safe text-xs uppercase tracking-widest text-ink-soft"
         >
-          Usuário
+          Código de acesso
         </label>
         <input
-          id="username"
-          name="username"
-          type="text"
-          autoComplete="username"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-          placeholder="Usuário"
-          required
-          className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
-        />
-      </div>
-
-      <div>
-        <label
-          htmlFor="password"
-          className="font-mono-safe text-xs uppercase tracking-widest text-ink-soft"
-        >
-          Senha
-        </label>
-        <input
-          id="password"
-          name="password"
+          id="code"
+          name="code"
           type="password"
-          autoComplete="current-password"
+          autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
+          autoFocus
           required
-          className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
+          placeholder="Código de acesso"
+          className="mt-2 w-full rounded-sm border border-line-strong bg-surface-2 px-4 py-3 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
         />
       </div>
 

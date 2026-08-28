@@ -33,8 +33,8 @@ export default async function AdminLoginPage() {
           Administração de Imagens
         </h1>
         <p className="mt-3 text-white">
-          Entre com as credenciais de administrador para gerenciar as fotos
-          exibidas em todo o site do Complexo Safe Works.
+          Digite o código de acesso para gerenciar as fotos e as equipes do
+          Complexo Safe Works.
         </p>
 
         <div className="mt-8 bg-surface border border-[#F0EBDB]/15 rounded-sm p-6 sm:p-8 text-ink">
