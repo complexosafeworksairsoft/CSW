@@ -5,3 +5,7 @@ out
 !.env.example
 *.log
 tsconfig.tsbuildinfo
+
+.vercel
+export-offline
+*.zip
