@@ -12,6 +12,8 @@ import {
 } from "@/lib/roster-data";
 import { findTeamById, getAllTeams } from "@/lib/teams";
 import { findUserById } from "@/lib/users";
+import { getSafetyInfo } from "@/lib/safety-info";
+import SafetyInfoForm from "./SafetyInfoForm";
 
 export const metadata: Metadata = {
   title: "Minha Conta | Safe Works",
@@ -33,11 +35,12 @@ export default async function ContaPage() {
     }
   }
 
-  const [activeRequest, team, teamProfile, allTeams] = await Promise.all([
+  const [activeRequest, team, teamProfile, allTeams, safetyInfo] = await Promise.all([
     getActiveRequestForUser(userId),
     operator?.teamId ? findTeamById(operator.teamId) : Promise.resolve(null),
     operator?.teamId ? getTeamProfile(operator.teamId) : Promise.resolve(null),
     operator?.teamId ? Promise.resolve(null) : getAllTeams(),
+    getSafetyInfo(userId),
   ]);
 
   return (
@@ -141,6 +144,10 @@ export default async function ContaPage() {
             </ul>
           </>
         )}
+      </div>
+
+      <div className="mt-8">
+        <SafetyInfoForm info={safetyInfo} />
       </div>
     </section>
   );

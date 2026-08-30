@@ -7,6 +7,7 @@ import { getAllUsers, getPendingUsers } from "@/lib/users";
 import { getAllActiveRequests } from "@/lib/membership";
 import { getPendingBookings } from "@/lib/field-bookings";
 import { getAllOperators } from "@/lib/roster-data";
+import { getAllSafetyInfo } from "@/lib/safety-info";
 import { logoutAdminAction } from "../admin-actions";
 import AdminSlotCard from "./AdminSlotCard";
 import TeamList from "./TeamList";
@@ -47,13 +48,15 @@ export default async function AdminImagesPage() {
   const groups = groupSlots();
   const teams = await getAllTeams();
 
-  const [users, pendingAccounts, activeRequests, pendingBookings, allOperators] = await Promise.all([
-    getAllUsers(),
-    getPendingUsers(),
-    getAllActiveRequests(),
-    getPendingBookings(),
-    getAllOperators(),
-  ]);
+  const [users, pendingAccounts, activeRequests, pendingBookings, allOperators, safetyInfoByUserId] =
+    await Promise.all([
+      getAllUsers(),
+      getPendingUsers(),
+      getAllActiveRequests(),
+      getPendingBookings(),
+      getAllOperators(),
+      getAllSafetyInfo(),
+    ]);
   const teamNameById = new Map(teams.map((t) => [t.id, t.teamName]));
   const requestByUserId = new Map(activeRequests.map((r) => [r.userId, r]));
   const userById = new Map(users.map((u) => [u.id, u]));
@@ -68,7 +71,15 @@ export default async function AdminImagesPage() {
             request.status === "pending" ? "aguardando aprovação" : "membro aprovado"
           }`
         : "Sem equipe";
-      return { id: user.id, username: user.username, displayName: user.displayName, teamLabel };
+      const safety = safetyInfoByUserId.get(user.id) ?? {
+        birthDate: null,
+        city: "",
+        bloodType: null,
+        medicalConditions: "",
+        emergencyContactName: "",
+        emergencyContactPhone: "",
+      };
+      return { id: user.id, username: user.username, displayName: user.displayName, teamLabel, safety };
     });
   const operatorScoreRows: OperatorScoreRow[] = allOperators.map((operator) => ({
     id: operator.id,

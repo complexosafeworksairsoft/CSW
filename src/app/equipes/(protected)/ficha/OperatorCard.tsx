@@ -117,6 +117,28 @@ export default function OperatorCard({ operator }: { operator: OperatorWithEquip
                     {item.description && (
                       <p className="mt-1 text-xs text-ink-soft break-words">{item.description}</p>
                     )}
+                    {(item.weaponClass || item.propulsion) && (
+                      <p className="mt-1.5 flex flex-wrap gap-1">
+                        {item.weaponClass && (
+                          <span className="rounded-sm border border-line-strong px-1.5 py-0.5 font-mono-safe text-[10px] uppercase tracking-widest text-ink-soft">
+                            {item.weaponClass}
+                          </span>
+                        )}
+                        {item.propulsion && (
+                          <span className="rounded-sm border border-line-strong px-1.5 py-0.5 font-mono-safe text-[10px] uppercase tracking-widest text-ink-soft">
+                            {item.propulsion}
+                          </span>
+                        )}
+                      </p>
+                    )}
+                    {[...item.optics, ...item.scopes, ...item.lightsLasers, ...item.muzzleDevices, ...item.stocks]
+                      .length > 0 && (
+                      <p className="mt-1 text-[11px] text-muted break-words">
+                        {[...item.optics, ...item.scopes, ...item.lightsLasers, ...item.muzzleDevices, ...item.stocks].join(
+                          " · "
+                        )}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <form action={removeEquipmentAction} className="mt-2">

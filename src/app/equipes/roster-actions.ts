@@ -16,11 +16,40 @@ import {
   updateOperator,
   updateTeamProfile,
 } from "@/lib/roster-data";
+import {
+  WEAPON_CLASSES,
+  PROPULSION_TYPES,
+  RED_DOT_OPTICS,
+  SCOPE_OPTICS,
+  LIGHTS_LASERS,
+  MUZZLE_DEVICES,
+  STOCKS,
+  GEAR_RATIOS,
+  MOTOR_TYPES,
+  SHAFT_SIZES,
+  BATTERIES,
+  BB_WEIGHTS,
+} from "@/lib/equipment-catalog";
 
 const FICHA_PATH = "/equipes/ficha";
 
 function readFit(formData: FormData, key: string): Fit {
   return formData.get(key) === "contain" ? "contain" : "cover";
+}
+
+// The equipment spec fields are all picked from a fixed catalog
+// (src/lib/equipment-catalog.ts) — never trust a submitted value blindly,
+// only accept it if it's actually one of the known options.
+function readCatalogSelect(formData: FormData, key: string, options: readonly string[]): string | null {
+  const value = String(formData.get(key) ?? "");
+  return (options as readonly string[]).includes(value) ? value : null;
+}
+
+function readCatalogMulti(formData: FormData, key: string, options: readonly string[]): string[] {
+  return formData
+    .getAll(key)
+    .map((v) => String(v))
+    .filter((v) => (options as readonly string[]).includes(v));
 }
 
 // `resetToken` is bumped on every successful submit and left unchanged on
@@ -218,6 +247,18 @@ export async function addEquipmentAction(
     name: name.slice(0, 120),
     brand: brand.slice(0, 80),
     description,
+    weaponClass: readCatalogSelect(formData, "weaponClass", WEAPON_CLASSES),
+    propulsion: readCatalogSelect(formData, "propulsion", PROPULSION_TYPES),
+    optics: readCatalogMulti(formData, "optics", RED_DOT_OPTICS),
+    scopes: readCatalogMulti(formData, "scopes", SCOPE_OPTICS),
+    lightsLasers: readCatalogMulti(formData, "lightsLasers", LIGHTS_LASERS),
+    muzzleDevices: readCatalogMulti(formData, "muzzleDevices", MUZZLE_DEVICES),
+    stocks: readCatalogMulti(formData, "stocks", STOCKS),
+    gearRatio: readCatalogSelect(formData, "gearRatio", GEAR_RATIOS),
+    motorType: readCatalogSelect(formData, "motorType", MOTOR_TYPES),
+    shaftSize: readCatalogSelect(formData, "shaftSize", SHAFT_SIZES),
+    battery: readCatalogSelect(formData, "battery", BATTERIES),
+    bbWeight: readCatalogSelect(formData, "bbWeight", BB_WEIGHTS),
   });
 
   if (!result.ok) {

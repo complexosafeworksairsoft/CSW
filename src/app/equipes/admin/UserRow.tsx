@@ -15,7 +15,21 @@ export type UserRowData = {
   username: string;
   displayName: string;
   teamLabel: string;
+  safety: {
+    birthDate: string | null;
+    city: string;
+    bloodType: string | null;
+    medicalConditions: string;
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+  };
 };
+
+function formatBirthDate(iso: string | null): string {
+  if (!iso) return "Não informado";
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
 
 /**
  * One account row: identity + team affiliation, a delete button, and an
@@ -26,6 +40,7 @@ export type UserRowData = {
  */
 export default function UserRow({ user }: { user: UserRowData }) {
   const [editing, setEditing] = useState(false);
+  const [showSafety, setShowSafety] = useState(false);
   const [state, formAction, pending] = useActionState(changeUserPasswordAction, initialState);
 
   // Collapse the form once a save actually succeeds (resetToken only bumps
@@ -55,6 +70,14 @@ export default function UserRow({ user }: { user: UserRowData }) {
             className="inline-flex items-center gap-1.5 rounded-sm border border-line-strong px-3 py-1.5 font-mono-safe text-[11px] uppercase tracking-widest text-muted transition-colors hover:border-accent hover:text-accent"
           >
             {editing ? "Cancelar" : "Alterar senha"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowSafety((v) => !v)}
+            className="inline-flex items-center gap-1.5 rounded-sm border border-line-strong px-3 py-1.5 font-mono-safe text-[11px] uppercase tracking-widest text-muted transition-colors hover:border-accent hover:text-accent"
+          >
+            {showSafety ? "Ocultar dados de segurança" : "Dados de segurança"}
           </button>
 
           <form action={removeUserAction}>
@@ -108,6 +131,33 @@ export default function UserRow({ user }: { user: UserRowData }) {
             </p>
           )}
         </form>
+      )}
+
+      {showSafety && (
+        <div className="mt-3 grid gap-2 border border-dashed border-line-strong bg-surface-2 p-4 text-sm sm:grid-cols-2">
+          <p>
+            <span className="text-muted">Nascimento: </span>
+            {formatBirthDate(user.safety.birthDate)}
+          </p>
+          <p>
+            <span className="text-muted">Cidade/Bairro: </span>
+            {user.safety.city || "Não informado"}
+          </p>
+          <p>
+            <span className="text-muted">Tipo sanguíneo: </span>
+            {user.safety.bloodType ?? "Não informado"}
+          </p>
+          <p>
+            <span className="text-muted">Contato de emergência: </span>
+            {user.safety.emergencyContactName || user.safety.emergencyContactPhone
+              ? `${user.safety.emergencyContactName || "?"} · ${user.safety.emergencyContactPhone || "?"}`
+              : "Não informado"}
+          </p>
+          <p className="sm:col-span-2">
+            <span className="text-muted">Alergias/condições médicas: </span>
+            {user.safety.medicalConditions || "Não informado"}
+          </p>
+        </div>
       )}
     </li>
   );

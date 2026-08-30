@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createUser, findUserByCredentials } from "@/lib/users";
 import { createUserSession, destroyUserSession, readUserSessionId } from "@/lib/user-session";
 import { requestMembership } from "@/lib/membership";
+import { updateSafetyInfo } from "@/lib/safety-info";
 
 export type AuthState = {
   error: string | null;
@@ -102,4 +103,43 @@ export async function requestMembershipAction(
 
   revalidatePath("/conta");
   return { error: null };
+}
+
+export type SafetyInfoState = {
+  error: string | null;
+  saved: boolean;
+};
+
+/**
+ * Saves the account's own private safety/emergency data (see
+ * src/lib/safety-info.ts). Never touches `operators` or anything a team or
+ * the public site can read.
+ */
+export async function updateSafetyInfoAction(
+  _prevState: SafetyInfoState,
+  formData: FormData
+): Promise<SafetyInfoState> {
+  const userId = await readUserSessionId();
+  if (!userId) {
+    redirect("/conta/login");
+  }
+
+  const birthDateRaw = String(formData.get("birthDate") ?? "").trim();
+  const city = String(formData.get("city") ?? "").trim().slice(0, 120);
+  const bloodTypeRaw = String(formData.get("bloodType") ?? "").trim();
+  const medicalConditions = String(formData.get("medicalConditions") ?? "").trim().slice(0, 500);
+  const emergencyContactName = String(formData.get("emergencyContactName") ?? "").trim().slice(0, 120);
+  const emergencyContactPhone = String(formData.get("emergencyContactPhone") ?? "").trim().slice(0, 40);
+
+  await updateSafetyInfo(userId, {
+    birthDate: birthDateRaw || null,
+    city,
+    bloodType: bloodTypeRaw || null,
+    medicalConditions,
+    emergencyContactName,
+    emergencyContactPhone,
+  });
+
+  revalidatePath("/conta");
+  return { error: null, saved: true };
 }

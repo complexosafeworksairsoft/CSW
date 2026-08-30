@@ -198,6 +198,37 @@ alter table operators add column if not exists score integer not null default 0 
 -- aceitar null (operador ainda sem equipe).
 alter table operators alter column team_id drop not null;
 
+-- Especificações técnicas do equipamento (baseado na Ficha de Armamento e
+-- Equipamento Tático fornecida pelo dono). Tudo opcional — só se aplica de
+-- fato a réplicas (AEG/GBB/etc.), não a qualquer item cadastrado.
+alter table equipment add column if not exists weapon_class text;
+alter table equipment add column if not exists propulsion text;
+alter table equipment add column if not exists optics text[] not null default '{}';
+alter table equipment add column if not exists scopes text[] not null default '{}';
+alter table equipment add column if not exists lights_lasers text[] not null default '{}';
+alter table equipment add column if not exists muzzle_devices text[] not null default '{}';
+alter table equipment add column if not exists stocks text[] not null default '{}';
+alter table equipment add column if not exists gear_ratio text;
+alter table equipment add column if not exists motor_type text;
+alter table equipment add column if not exists shaft_size text;
+alter table equipment add column if not exists battery text;
+alter table equipment add column if not exists bb_weight text;
+
+-- Dados de segurança do operador (baseado na Ficha de Inscrição fornecida
+-- pelo dono) — PRIVADOS: só o próprio dono da conta edita (ver
+-- src/lib/safety-info.ts), e só o admin pode consultar (em caso de
+-- emergência em campo). Nunca exposto às equipes nem ao site público.
+create table if not exists operator_safety_info (
+  user_id text primary key references users(id) on delete cascade,
+  birth_date date,
+  city text not null default '',
+  blood_type text,
+  medical_conditions text not null default '',
+  emergency_contact_name text not null default '',
+  emergency_contact_phone text not null default '',
+  updated_at timestamptz not null default now()
+);
+
 -- Seed: os briefings/comunicados de exemplo do conteúdo exclusivo.
 insert into content_items (id, date, kind, title, body) values
   ('briefing-poeira-vermelha', '2026-09-25', 'briefing', 'Briefing — Operação Poeira Vermelha', 'Cenário: disputa por três pontos de controle distribuídos entre os setores 1, 2 e 3. Reabastecimento (BB e água) liberado apenas nos pontos marcados no mapa entregue na chegada. Respawn escalonado a cada 15 minutos nas primeiras duas horas, depois passa a ser por eliminação de setor. Uso de fumaça tática liberado nos pontos de controle. Equipes devem indicar um líder de esquadrão no check-in.'),

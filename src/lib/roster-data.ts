@@ -64,6 +64,20 @@ export type Equipment = {
   name: string;
   brand: string;
   description: string; // hard max 200 chars, enforced in roster-actions.ts too
+  // Especificações técnicas (ver src/lib/equipment-catalog.ts) — tudo
+  // opcional, só se aplica de fato a réplicas.
+  weaponClass: string | null;
+  propulsion: string | null;
+  optics: string[];
+  scopes: string[];
+  lightsLasers: string[];
+  muzzleDevices: string[];
+  stocks: string[];
+  gearRatio: string | null;
+  motorType: string | null;
+  shaftSize: string | null;
+  battery: string | null;
+  bbWeight: string | null;
 };
 
 type TeamProfileRow = {
@@ -97,6 +111,18 @@ type EquipmentRow = {
   name: string;
   brand: string;
   description: string;
+  weapon_class: string | null;
+  propulsion: string | null;
+  optics: string[];
+  scopes: string[];
+  lights_lasers: string[];
+  muzzle_devices: string[];
+  stocks: string[];
+  gear_ratio: string | null;
+  motor_type: string | null;
+  shaft_size: string | null;
+  battery: string | null;
+  bb_weight: string | null;
 };
 
 function rowToTeamProfile(row: TeamProfileRow): TeamProfile {
@@ -135,6 +161,18 @@ function rowToEquipment(row: EquipmentRow): Equipment {
     name: row.name,
     brand: row.brand,
     description: row.description,
+    weaponClass: row.weapon_class,
+    propulsion: row.propulsion,
+    optics: row.optics ?? [],
+    scopes: row.scopes ?? [],
+    lightsLasers: row.lights_lasers ?? [],
+    muzzleDevices: row.muzzle_devices ?? [],
+    stocks: row.stocks ?? [],
+    gearRatio: row.gear_ratio,
+    motorType: row.motor_type,
+    shaftSize: row.shaft_size,
+    battery: row.battery,
+    bbWeight: row.bb_weight,
   };
 }
 
@@ -494,6 +532,18 @@ export type AddEquipmentInput = {
   name: string;
   brand: string;
   description: string;
+  weaponClass?: string | null;
+  propulsion?: string | null;
+  optics?: string[];
+  scopes?: string[];
+  lightsLasers?: string[];
+  muzzleDevices?: string[];
+  stocks?: string[];
+  gearRatio?: string | null;
+  motorType?: string | null;
+  shaftSize?: string | null;
+  battery?: string | null;
+  bbWeight?: string | null;
 };
 
 export async function addEquipment(
@@ -523,6 +573,18 @@ export async function addEquipment(
       name: input.name,
       brand: input.brand,
       description: input.description,
+      weapon_class: input.weaponClass ?? null,
+      propulsion: input.propulsion ?? null,
+      optics: input.optics ?? [],
+      scopes: input.scopes ?? [],
+      lights_lasers: input.lightsLasers ?? [],
+      muzzle_devices: input.muzzleDevices ?? [],
+      stocks: input.stocks ?? [],
+      gear_ratio: input.gearRatio ?? null,
+      motor_type: input.motorType ?? null,
+      shaft_size: input.shaftSize ?? null,
+      battery: input.battery ?? null,
+      bb_weight: input.bbWeight ?? null,
     })
     .select("*")
     .maybeSingle<EquipmentRow>();
