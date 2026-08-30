@@ -12,6 +12,8 @@ type ImagePlaceholderProps = {
   label: string;
   ratio?: Ratio;
   className?: string;
+  /** Hides the label text, showing just the icon — for small tiles (e.g. a feed card's thumbnail) where the label would overflow. */
+  compact?: boolean;
 };
 
 /**
@@ -22,6 +24,7 @@ export default function ImagePlaceholder({
   label,
   ratio = "video",
   className = "",
+  compact = false,
 }: ImagePlaceholderProps) {
   return (
     <div
@@ -54,9 +57,12 @@ export default function ImagePlaceholder({
           <circle cx="8.5" cy="9.5" r="1.5" />
           <path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span className="font-mono-safe text-[11px] uppercase tracking-widest text-muted max-w-[16rem]">
-          {label}
-        </span>
+        {!compact && (
+          <span className="font-mono-safe text-[11px] uppercase tracking-widest text-muted max-w-[16rem]">
+            {label}
+          </span>
+        )}
+        {compact && <span className="sr-only">{label}</span>}
       </div>
     </div>
   );

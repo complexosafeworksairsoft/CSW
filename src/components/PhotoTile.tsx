@@ -28,16 +28,19 @@ export default function PhotoTile({
   label,
   ratio = "square",
   fit = "cover",
+  compact = false,
   className = "",
 }: {
   photo: string | null;
   label: string;
   ratio?: Ratio;
   fit?: Fit;
+  /** Hides the placeholder's label text — pass for small tiles (e.g. a feed thumbnail) where it would overflow. */
+  compact?: boolean;
   className?: string;
 }) {
   if (!photo) {
-    return <ImagePlaceholder label={label} ratio={ratio} className={className} />;
+    return <ImagePlaceholder label={label} ratio={ratio} className={className} compact={compact} />;
   }
   return (
     <div

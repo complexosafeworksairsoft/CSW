@@ -27,7 +27,7 @@ export default function Footer() {
           <ul className="mt-3 flex flex-col gap-2 text-sm text-ink-soft">
             <li>Mossoró / RN</li>
             <li><Link href="/regras" className="hover:text-olive-deep">Central de Regras</Link></li>
-            <li><Link href="/equipes" className="hover:text-olive-deep">Portal de Equipes</Link></li>
+            <li><Link href="/equipes" className="hover:text-olive-deep">Login de Equipe</Link></li>
             <li><Link href="/conta" className="hover:text-olive-deep">Minha Conta</Link></li>
             <li><Link href="/contato" className="hover:text-olive-deep">Fale conosco</Link></li>
           </ul>
