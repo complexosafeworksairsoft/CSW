@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { Fit } from "@/lib/image-processing";
 
 type Ratio = "video" | "square" | "portrait" | "wide";
 
@@ -18,6 +19,8 @@ type PhotoUploadFieldProps = {
   label?: string;
   /** Already-saved photo (data URI) to show as the initial preview, if any. */
   existingPhoto?: string | null;
+  /** Fit already saved for existingPhoto, if any — seeds the "Recortar"/"Original" picker below. */
+  existingFit?: Fit;
   ratio?: Ratio;
   className?: string;
 };
@@ -27,17 +30,20 @@ type PhotoUploadFieldProps = {
  * / camera-icon visual language, but wraps a hidden file input and shows a
  * live local preview as soon as a photo is picked. Works inside a <form>
  * submitted by a Server Action — the file travels as normal multipart
- * FormData under `name`.
+ * FormData under `name`, and the chosen fit travels alongside it as
+ * `${name}Fit` (read server-side via src/lib/photo-upload.ts).
  */
 export default function PhotoUploadField({
   name,
   label = "Foto",
   existingPhoto = null,
+  existingFit = "cover",
   ratio = "square",
   className = "",
 }: PhotoUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(existingPhoto);
+  const [fit, setFit] = useState<Fit>(existingFit);
   const objectUrlRef = useRef<string | null>(null);
 
   // Revoke any blob: URL we created once it's no longer shown, so we don't
@@ -82,7 +88,7 @@ export default function PhotoUploadField({
           <img
             src={preview}
             alt={label}
-            className="absolute inset-0 h-full w-full object-cover"
+            className={`absolute inset-0 h-full w-full ${fit === "contain" ? "object-contain" : "object-cover"}`}
           />
         )}
 
@@ -126,6 +132,31 @@ export default function PhotoUploadField({
         onChange={handleChange}
         className="sr-only"
       />
+
+      <div role="radiogroup" aria-label="Enquadramento da imagem" className="mt-2 flex gap-4">
+        <label className="flex cursor-pointer items-center gap-1.5 font-mono-safe text-[11px] uppercase tracking-widest text-ink-soft">
+          <input
+            type="radio"
+            name={`${name}Fit`}
+            value="cover"
+            checked={fit === "cover"}
+            onChange={() => setFit("cover")}
+            className="accent-accent"
+          />
+          Recortar
+        </label>
+        <label className="flex cursor-pointer items-center gap-1.5 font-mono-safe text-[11px] uppercase tracking-widest text-ink-soft">
+          <input
+            type="radio"
+            name={`${name}Fit`}
+            value="contain"
+            checked={fit === "contain"}
+            onChange={() => setFit("contain")}
+            className="accent-accent"
+          />
+          Original
+        </label>
+      </div>
     </div>
   );
 }

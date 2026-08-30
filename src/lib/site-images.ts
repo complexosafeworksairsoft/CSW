@@ -18,6 +18,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
+import type { Fit } from "./image-processing";
 
 // supabase() (src/lib/supabase.ts) is typed as `ReturnType<typeof createClient>`
 // without a generated Database type, which — through a TypeScript quirk in how
@@ -80,13 +81,14 @@ const SLOT_KEYS = new Set(SITE_IMAGE_SLOTS.map((s) => s.key));
 type SiteImageRow = {
   slot_key: string;
   photo: string;
+  fit: Fit;
 };
 
 export function isKnownSiteImageSlot(key: string): boolean {
   return SLOT_KEYS.has(key);
 }
 
-/** Returns the saved photo (data URI) for a slot, or null if none was uploaded yet. */
+/** Returns the saved photo (data URI) for a slot, or null if none was uploaded yet. Doesn't carry `fit` — use getSiteImageWithFit where the crop mode matters (anywhere a photo is actually displayed on a page). */
 export async function getSiteImage(key: string): Promise<string | null> {
   const { data, error } = await db()
     .from("site_images")
@@ -98,13 +100,27 @@ export async function getSiteImage(key: string): Promise<string | null> {
   return data.photo;
 }
 
-/** Saves a photo for a known slot. No-op (never silently creates new slots) if the key isn't in SITE_IMAGE_SLOTS. */
-export async function setSiteImage(key: string, dataUri: string): Promise<void> {
+/** Same as getSiteImage, but also returns the enquadramento ('cover'/'contain') chosen at upload — see src/lib/image-processing.ts. */
+export async function getSiteImageWithFit(
+  key: string
+): Promise<{ photo: string; fit: Fit } | null> {
+  const { data, error } = await db()
+    .from("site_images")
+    .select("photo, fit")
+    .eq("slot_key", key)
+    .maybeSingle<SiteImageRow>();
+
+  if (error || !data) return null;
+  return { photo: data.photo, fit: data.fit };
+}
+
+/** Saves a photo (and its chosen fit) for a known slot. No-op (never silently creates new slots) if the key isn't in SITE_IMAGE_SLOTS. */
+export async function setSiteImage(key: string, dataUri: string, fit: Fit): Promise<void> {
   if (!isKnownSiteImageSlot(key)) return;
   await db()
     .from("site_images")
     .upsert(
-      { slot_key: key, photo: dataUri, updated_at: new Date().toISOString() },
+      { slot_key: key, photo: dataUri, fit, updated_at: new Date().toISOString() },
       { onConflict: "slot_key" }
     );
 }

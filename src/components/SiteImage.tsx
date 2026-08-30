@@ -1,5 +1,5 @@
 import PhotoTile from "@/components/PhotoTile";
-import { getSiteImage, type Ratio } from "@/lib/site-images";
+import { getSiteImageWithFit, type Ratio } from "@/lib/site-images";
 
 type SiteImageProps = {
   /** Key into SITE_IMAGE_SLOTS (src/lib/site-images.ts) identifying this slot. */
@@ -25,6 +25,14 @@ export default async function SiteImage({
   ratio = "square",
   className = "",
 }: SiteImageProps) {
-  const photo = await getSiteImage(slotKey);
-  return <PhotoTile photo={photo} label={label} ratio={ratio} className={className} />;
+  const saved = await getSiteImageWithFit(slotKey);
+  return (
+    <PhotoTile
+      photo={saved?.photo ?? null}
+      fit={saved?.fit}
+      label={label}
+      ratio={ratio}
+      className={className}
+    />
+  );
 }

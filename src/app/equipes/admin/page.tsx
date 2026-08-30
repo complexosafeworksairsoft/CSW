@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { readAdminSession } from "@/lib/admin-session";
-import { getSiteImage, SITE_IMAGE_SLOTS } from "@/lib/site-images";
+import { getSiteImageWithFit, SITE_IMAGE_SLOTS } from "@/lib/site-images";
 import { getAllTeams } from "@/lib/teams";
 import { getAllUsers } from "@/lib/users";
 import { getAllActiveRequests } from "@/lib/membership";
@@ -74,7 +74,7 @@ export default async function AdminImagesPage() {
   });
 
   const photoEntries = await Promise.all(
-    SITE_IMAGE_SLOTS.map(async (slot) => [slot.key, await getSiteImage(slot.key)] as const)
+    SITE_IMAGE_SLOTS.map(async (slot) => [slot.key, await getSiteImageWithFit(slot.key)] as const)
   );
   const photosBySlotKey = new Map(photoEntries);
 

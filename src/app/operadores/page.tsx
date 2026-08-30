@@ -74,6 +74,7 @@ export default async function OperadoresPage() {
                 </span>
                 <PhotoTile
                   photo={operator.photo}
+                  fit={operator.photoFit}
                   label={`Foto: ${operator.name}`}
                   className="mb-3"
                 />
@@ -123,6 +124,7 @@ export default async function OperadoresPage() {
                 >
                   <PhotoTile
                     photo={profile.photo}
+                    fit={profile.photoFit}
                     label={`Foto: ${team.teamName}`}
                     className="mb-4"
                   />

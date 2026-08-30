@@ -5,6 +5,7 @@ import PhotoTile from "@/components/PhotoTile";
 import PhotoUploadField from "@/components/PhotoUploadField";
 import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import type { SiteImageSlot } from "@/lib/site-images";
+import type { Fit } from "@/lib/image-processing";
 import { updateSiteImageAction, clearSiteImageAction, type ActionState } from "../admin-actions";
 
 const initialState: ActionState = { error: null, resetToken: 0 };
@@ -21,7 +22,7 @@ export default function AdminSlotCard({
   photo,
 }: {
   slot: SiteImageSlot;
-  photo: string | null;
+  photo: { photo: string; fit: Fit } | null;
 }) {
   const [state, formAction, pending] = useActionState(updateSiteImageAction, initialState);
 
@@ -37,7 +38,7 @@ export default function AdminSlotCard({
           <span className="block font-mono-safe text-[10px] uppercase tracking-widest text-muted mb-2">
             Atual
           </span>
-          <PhotoTile photo={photo} label={slot.label} ratio={slot.ratio} />
+          <PhotoTile photo={photo?.photo ?? null} fit={photo?.fit} label={slot.label} ratio={slot.ratio} />
           {photo && (
             <form action={clearSiteImageAction} className="mt-3">
               <input type="hidden" name="slotKey" value={slot.key} />
@@ -55,7 +56,7 @@ export default function AdminSlotCard({
             Nova imagem
           </span>
           <input type="hidden" name="slotKey" value={slot.key} />
-          <PhotoUploadField name="photo" label={slot.label} ratio={slot.ratio} />
+          <PhotoUploadField name="photo" label={slot.label} ratio={slot.ratio} existingFit={photo?.fit} />
 
           {state.error && (
             <p

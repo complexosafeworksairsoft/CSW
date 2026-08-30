@@ -86,6 +86,7 @@ export default function OperatorActions({ operator }: { operator: Operator }) {
               name="photo"
               label="Foto do operador"
               existingPhoto={operator.photo}
+              existingFit={operator.photoFit}
               ratio="square"
             />
 

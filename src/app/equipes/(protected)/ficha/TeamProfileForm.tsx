@@ -25,6 +25,7 @@ export default function TeamProfileForm({
           name="photo"
           label="Foto da equipe"
           existingPhoto={profile.photo}
+          existingFit={profile.photoFit}
           ratio="square"
         />
 

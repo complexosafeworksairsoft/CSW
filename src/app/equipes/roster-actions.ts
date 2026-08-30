@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { readSessionTeamId } from "@/lib/session";
 import { readPhotoUpload } from "@/lib/photo-upload";
+import type { Fit } from "@/lib/image-processing";
 import { updateTeamName } from "@/lib/teams";
 import {
   addEquipment,
@@ -17,6 +18,10 @@ import {
 } from "@/lib/roster-data";
 
 const FICHA_PATH = "/equipes/ficha";
+
+function readFit(formData: FormData, key: string): Fit {
+  return formData.get(key) === "contain" ? "contain" : "cover";
+}
 
 // `resetToken` is bumped on every successful submit and left unchanged on
 // error. Add-forms use it as a React `key` to reset their (uncontrolled)
@@ -36,7 +41,7 @@ export async function updateTeamProfileAction(
     redirect("/equipes/login");
   }
 
-  const photoResult = await readPhotoUpload(formData.get("photo"));
+  const photoResult = await readPhotoUpload(formData.get("photo"), "square", readFit(formData, "photoFit"));
   if (photoResult.kind === "error") {
     return { error: photoResult.message, resetToken: prevState.resetToken };
   }
@@ -53,7 +58,7 @@ export async function updateTeamProfileAction(
     .slice(0, 2000);
 
   await updateTeamProfile(teamId, {
-    ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri } : {}),
+    ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri, photoFit: photoResult.fit } : {}),
     foundedDate: foundedDateRaw || null,
     eventsOrg,
   });
@@ -74,7 +79,7 @@ export async function addOperatorAction(
     redirect("/equipes/login");
   }
 
-  const photoResult = await readPhotoUpload(formData.get("photo"));
+  const photoResult = await readPhotoUpload(formData.get("photo"), "square", readFit(formData, "photoFit"));
   if (photoResult.kind === "error") {
     return { error: photoResult.message, resetToken: prevState.resetToken };
   }
@@ -94,6 +99,7 @@ export async function addOperatorAction(
 
   const result = await addOperator(teamId, {
     photo: photoResult.kind === "ok" ? photoResult.dataUri : null,
+    photoFit: photoResult.kind === "ok" ? photoResult.fit : undefined,
     name: name.slice(0, 120),
     tag: tag.slice(0, 40),
     startMonth: startMonth.slice(0, 7),
@@ -124,7 +130,7 @@ export async function updateOperatorAction(
     return { error: "Operador não encontrado.", resetToken: prevState.resetToken };
   }
 
-  const photoResult = await readPhotoUpload(formData.get("photo"));
+  const photoResult = await readPhotoUpload(formData.get("photo"), "square", readFit(formData, "photoFit"));
   if (photoResult.kind === "error") {
     return { error: photoResult.message, resetToken: prevState.resetToken };
   }
@@ -142,7 +148,7 @@ export async function updateOperatorAction(
   }
 
   const result = await updateOperator(teamId, operator.id, {
-    ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri } : {}),
+    ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri, photoFit: photoResult.fit } : {}),
     name: name.slice(0, 120),
     tag: tag.slice(0, 40),
     startMonth: startMonth.slice(0, 7),
@@ -187,7 +193,7 @@ export async function addEquipmentAction(
     return { error: "Operador não encontrado.", resetToken: prevState.resetToken };
   }
 
-  const photoResult = await readPhotoUpload(formData.get("photo"));
+  const photoResult = await readPhotoUpload(formData.get("photo"), "square", readFit(formData, "photoFit"));
   if (photoResult.kind === "error") {
     return { error: photoResult.message, resetToken: prevState.resetToken };
   }
@@ -208,6 +214,7 @@ export async function addEquipmentAction(
 
   const result = await addEquipment(operator.id, {
     photo: photoResult.kind === "ok" ? photoResult.dataUri : null,
+    photoFit: photoResult.kind === "ok" ? photoResult.fit : undefined,
     name: name.slice(0, 120),
     brand: brand.slice(0, 80),
     description,

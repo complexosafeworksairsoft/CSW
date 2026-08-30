@@ -21,6 +21,7 @@ create table if not exists teams (
 create table if not exists team_profiles (
   team_id text primary key references teams(id) on delete cascade,
   photo text, -- data URI (protótipo) — TODO (produção): trocar por URL de storage real
+  photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain')),
   founded_date date,
   events_org text not null default '',
   updated_at timestamptz not null default now()
@@ -30,6 +31,7 @@ create table if not exists operators (
   id text primary key,
   team_id text not null references teams(id) on delete cascade,
   photo text,
+  photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain')),
   name text not null,
   tag text not null,
   start_month text not null default '', -- "AAAA-MM"
@@ -45,6 +47,7 @@ create table if not exists equipment (
   id text primary key,
   operator_id text not null references operators(id) on delete cascade,
   photo text,
+  photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain')),
   name text not null,
   brand text not null default '',
   description text not null default '',
@@ -82,6 +85,7 @@ create table if not exists content_items (
 create table if not exists site_images (
   slot_key text primary key,
   photo text not null, -- data URI (protótipo) — TODO (produção): URL de storage real
+  fit text not null default 'cover' check (fit in ('cover', 'contain')),
   updated_at timestamptz not null default now()
 );
 
@@ -166,6 +170,15 @@ create table if not exists field_bookings (
 create index if not exists field_bookings_user_id_idx on field_bookings(user_id);
 create index if not exists field_bookings_date_idx on field_bookings(date);
 create index if not exists field_bookings_status_idx on field_bookings(status);
+
+-- Enquadramento escolhido no upload (ver src/lib/image-processing.ts):
+-- 'cover' recorta a foto para preencher o espaço, 'contain' mantém o
+-- enquadramento original sem cortar. Default 'cover' preserva o
+-- comportamento visual que já existia antes dessa opção existir.
+alter table site_images add column if not exists fit text not null default 'cover' check (fit in ('cover', 'contain'));
+alter table team_profiles add column if not exists photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain'));
+alter table operators add column if not exists photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain'));
+alter table equipment add column if not exists photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain'));
 
 -- Seed: os briefings/comunicados de exemplo do conteúdo exclusivo.
 insert into content_items (id, date, kind, title, body) values

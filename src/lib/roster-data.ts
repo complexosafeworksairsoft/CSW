@@ -17,6 +17,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
+import type { Fit } from "./image-processing";
 
 // supabase() (src/lib/supabase.ts) is typed as `ReturnType<typeof createClient>`
 // without a generated Database type, which — through a TypeScript quirk in how
@@ -33,6 +34,7 @@ export const MAX_EQUIPMENT_PER_OPERATOR = 3;
 export type TeamProfile = {
   teamId: string;
   photo: string | null; // base64 data URI — see TODO above
+  photoFit: Fit; // enquadramento escolhido no upload, see src/lib/image-processing.ts
   foundedDate: string | null; // "AAAA-MM-DD"
   eventsOrg: string; // "Organização de Eventos" — free text
 };
@@ -41,6 +43,7 @@ export type Operator = {
   id: string;
   teamId: string;
   photo: string | null;
+  photoFit: Fit;
   name: string;
   tag: string;
   startMonth: string; // "AAAA-MM"
@@ -53,6 +56,7 @@ export type Equipment = {
   id: string;
   operatorId: string;
   photo: string | null;
+  photoFit: Fit;
   name: string;
   brand: string;
   description: string; // hard max 200 chars, enforced in roster-actions.ts too
@@ -61,6 +65,7 @@ export type Equipment = {
 type TeamProfileRow = {
   team_id: string;
   photo: string | null;
+  photo_fit: Fit;
   founded_date: string | null;
   events_org: string;
 };
@@ -69,6 +74,7 @@ type OperatorRow = {
   id: string;
   team_id: string;
   photo: string | null;
+  photo_fit: Fit;
   name: string;
   tag: string;
   start_month: string;
@@ -81,6 +87,7 @@ type EquipmentRow = {
   id: string;
   operator_id: string;
   photo: string | null;
+  photo_fit: Fit;
   name: string;
   brand: string;
   description: string;
@@ -90,6 +97,7 @@ function rowToTeamProfile(row: TeamProfileRow): TeamProfile {
   return {
     teamId: row.team_id,
     photo: row.photo,
+    photoFit: row.photo_fit,
     foundedDate: row.founded_date,
     eventsOrg: row.events_org,
   };
@@ -100,6 +108,7 @@ function rowToOperator(row: OperatorRow): Operator {
     id: row.id,
     teamId: row.team_id,
     photo: row.photo,
+    photoFit: row.photo_fit,
     name: row.name,
     tag: row.tag,
     startMonth: row.start_month,
@@ -114,6 +123,7 @@ function rowToEquipment(row: EquipmentRow): Equipment {
     id: row.id,
     operatorId: row.operator_id,
     photo: row.photo,
+    photoFit: row.photo_fit,
     name: row.name,
     brand: row.brand,
     description: row.description,
@@ -126,7 +136,7 @@ function generateId(prefix: string): string {
 }
 
 function defaultProfile(teamId: string): TeamProfile {
-  return { teamId, photo: null, foundedDate: null, eventsOrg: "" };
+  return { teamId, photo: null, photoFit: "cover", foundedDate: null, eventsOrg: "" };
 }
 
 /** Returns the team's profile, or sensible defaults if none was ever saved (no row is force-inserted just from a read). */
@@ -143,12 +153,13 @@ export async function getTeamProfile(teamId: string): Promise<TeamProfile> {
 
 export async function updateTeamProfile(
   teamId: string,
-  updates: Partial<Pick<TeamProfile, "photo" | "foundedDate" | "eventsOrg">>
+  updates: Partial<Pick<TeamProfile, "photo" | "photoFit" | "foundedDate" | "eventsOrg">>
 ): Promise<TeamProfile> {
   const current = await getTeamProfile(teamId);
   const next: TeamProfile = {
     teamId,
     photo: updates.photo !== undefined ? updates.photo : current.photo,
+    photoFit: updates.photoFit !== undefined ? updates.photoFit : current.photoFit,
     foundedDate: updates.foundedDate !== undefined ? updates.foundedDate : current.foundedDate,
     eventsOrg: updates.eventsOrg !== undefined ? updates.eventsOrg : current.eventsOrg,
   };
@@ -159,6 +170,7 @@ export async function updateTeamProfile(
       {
         team_id: next.teamId,
         photo: next.photo,
+        photo_fit: next.photoFit,
         founded_date: next.foundedDate,
         events_org: next.eventsOrg,
         updated_at: new Date().toISOString(),
@@ -214,6 +226,7 @@ export async function getOperatorForTeam(
 
 export type AddOperatorInput = {
   photo: string | null;
+  photoFit?: Fit; // defaults to "cover" — omit for callers (e.g. membership.ts) that never set a photo at creation time
   name: string;
   tag: string;
   startMonth: string;
@@ -245,6 +258,7 @@ export async function addOperator(
       id,
       team_id: teamId,
       photo: input.photo,
+      photo_fit: input.photoFit ?? "cover",
       name: input.name,
       tag: input.tag,
       start_month: input.startMonth,
@@ -263,6 +277,7 @@ export async function addOperator(
 
 export type UpdateOperatorInput = {
   photo?: string | null;
+  photoFit?: Fit; // only written when `photo` is also present — see below
   name: string;
   tag: string;
   startMonth: string;
@@ -271,9 +286,10 @@ export type UpdateOperatorInput = {
 
 /**
  * Updates an existing operator's own fields (scoped to the team — a team
- * can never edit another team's operator). `photo` is only overwritten when
- * explicitly present in the input (a new upload); omit it to keep the
- * operator's current photo, same convention as updateTeamProfile().
+ * can never edit another team's operator). `photo`/`photoFit` are only
+ * overwritten when `photo` is explicitly present in the input (a new
+ * upload); omit it to keep the operator's current photo, same convention as
+ * updateTeamProfile().
  */
 export async function updateOperator(
   teamId: string,
@@ -283,7 +299,9 @@ export async function updateOperator(
   const { data, error } = await db()
     .from("operators")
     .update({
-      ...(input.photo !== undefined ? { photo: input.photo } : {}),
+      ...(input.photo !== undefined
+        ? { photo: input.photo, photo_fit: input.photoFit ?? "cover" }
+        : {}),
       name: input.name,
       tag: input.tag,
       start_month: input.startMonth,
@@ -352,6 +370,7 @@ export async function getEquipment(operatorId: string): Promise<Equipment[]> {
 
 export type AddEquipmentInput = {
   photo: string | null;
+  photoFit?: Fit;
   name: string;
   brand: string;
   description: string;
@@ -380,6 +399,7 @@ export async function addEquipment(
       id,
       operator_id: operatorId,
       photo: input.photo,
+      photo_fit: input.photoFit ?? "cover",
       name: input.name,
       brand: input.brand,
       description: input.description,

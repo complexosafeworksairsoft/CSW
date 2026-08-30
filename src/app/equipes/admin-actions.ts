@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { isValidAdminAccessCode } from "@/lib/admin";
 import { createAdminSession, destroyAdminSession, readAdminSession } from "@/lib/admin-session";
 import { readPhotoUpload } from "@/lib/photo-upload";
-import { isKnownSiteImageSlot, setSiteImage, clearSiteImage } from "@/lib/site-images";
+import type { Fit } from "@/lib/image-processing";
+import { isKnownSiteImageSlot, setSiteImage, clearSiteImage, SITE_IMAGE_SLOTS } from "@/lib/site-images";
 
 const ADMIN_LOGIN_PATH = "/equipes/admin/login";
 
@@ -55,11 +56,13 @@ export async function updateSiteImageAction(
   }
 
   const slotKey = String(formData.get("slotKey") ?? "");
-  if (!isKnownSiteImageSlot(slotKey)) {
+  const slot = SITE_IMAGE_SLOTS.find((s) => s.key === slotKey);
+  if (!slot || !isKnownSiteImageSlot(slotKey)) {
     return { error: "Slot de imagem desconhecido.", resetToken: prevState.resetToken };
   }
 
-  const photoResult = await readPhotoUpload(formData.get("photo"));
+  const fit: Fit = formData.get("photoFit") === "contain" ? "contain" : "cover";
+  const photoResult = await readPhotoUpload(formData.get("photo"), slot.ratio, fit);
   if (photoResult.kind === "error") {
     return { error: photoResult.message, resetToken: prevState.resetToken };
   }
@@ -67,7 +70,7 @@ export async function updateSiteImageAction(
     return { error: "Selecione uma imagem para enviar.", resetToken: prevState.resetToken };
   }
 
-  await setSiteImage(slotKey, photoResult.dataUri);
+  await setSiteImage(slotKey, photoResult.dataUri, photoResult.fit);
 
   revalidatePath("/", "layout");
   return { error: null, resetToken: prevState.resetToken + 1 };

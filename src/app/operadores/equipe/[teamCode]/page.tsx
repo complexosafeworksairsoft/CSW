@@ -58,6 +58,7 @@ export default async function TeamPublicRosterPage({ params }: { params: Params 
                 <div className="flex gap-4">
                   <PhotoTile
                     photo={operator.photo}
+                    fit={operator.photoFit}
                     label={`Foto: ${operator.name}`}
                     className="w-20 shrink-0"
                   />
