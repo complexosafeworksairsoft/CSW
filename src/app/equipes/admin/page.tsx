@@ -3,10 +3,16 @@ import { redirect } from "next/navigation";
 import { readAdminSession } from "@/lib/admin-session";
 import { getSiteImage, SITE_IMAGE_SLOTS } from "@/lib/site-images";
 import { getAllTeams } from "@/lib/teams";
+import { getAllUsers } from "@/lib/users";
+import { getAllActiveRequests } from "@/lib/membership";
+import { getPendingBookings } from "@/lib/field-bookings";
 import { logoutAdminAction } from "../admin-actions";
 import AdminSlotCard from "./AdminSlotCard";
 import TeamList from "./TeamList";
 import CreateTeamForm from "./CreateTeamForm";
+import UserList from "./UserList";
+import type { UserRowData } from "./UserRow";
+import PendingBookingsList, { type PendingBookingRow } from "./PendingBookingsList";
 
 export const metadata: Metadata = {
   title: "Administração de Imagens | Safe Works",
@@ -37,6 +43,35 @@ export default async function AdminImagesPage() {
 
   const groups = groupSlots();
   const teams = await getAllTeams();
+
+  const [users, activeRequests, pendingBookings] = await Promise.all([
+    getAllUsers(),
+    getAllActiveRequests(),
+    getPendingBookings(),
+  ]);
+  const teamNameById = new Map(teams.map((t) => [t.id, t.teamName]));
+  const requestByUserId = new Map(activeRequests.map((r) => [r.userId, r]));
+  const userById = new Map(users.map((u) => [u.id, u]));
+  const userRows: UserRowData[] = users.map((user) => {
+    const request = requestByUserId.get(user.id);
+    const teamLabel = request
+      ? `${teamNameById.get(request.teamId) ?? "Equipe"} · ${
+          request.status === "pending" ? "aguardando aprovação" : "membro aprovado"
+        }`
+      : "Sem equipe";
+    return { id: user.id, username: user.username, displayName: user.displayName, teamLabel };
+  });
+  const pendingBookingRows: PendingBookingRow[] = pendingBookings.map((booking) => {
+    const user = userById.get(booking.userId);
+    return {
+      id: booking.id,
+      date: booking.date,
+      startTime: booking.startTime,
+      endTime: booking.endTime,
+      username: user?.username ?? "?",
+      displayName: user?.displayName ?? "Usuário",
+    };
+  });
 
   const photoEntries = await Promise.all(
     SITE_IMAGE_SLOTS.map(async (slot) => [slot.key, await getSiteImage(slot.key)] as const)
@@ -89,6 +124,39 @@ export default async function AdminImagesPage() {
 
           <div className="mt-6">
             <CreateTeamForm />
+          </div>
+        </section>
+
+        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+          <p className="eyebrow">Contas de usuário</p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
+            Acessos individuais
+          </h2>
+          <p className="mt-2 text-sm text-ink-soft max-w-2xl">
+            Contas que as próprias pessoas criam em /conta. Veja a qual
+            equipe cada uma está vinculada, redefina a senha de quem perdeu
+            acesso (não há e-mail cadastrado, então não existe recuperação
+            automática) ou exclua uma conta.
+          </p>
+
+          <div className="mt-6">
+            <UserList users={userRows} />
+          </div>
+        </section>
+
+        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+          <p className="eyebrow">Campo de jogo</p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
+            Agendamentos pendentes
+          </h2>
+          <p className="mt-2 text-sm text-ink-soft max-w-2xl">
+            Pedidos de horário para jogar, feitos em /conta/agendamentos.
+            Confirmar garante a vaga da pessoa; recusar libera o horário para
+            outra solicitação.
+          </p>
+
+          <div className="mt-6">
+            <PendingBookingsList bookings={pendingBookingRows} />
           </div>
         </section>
 

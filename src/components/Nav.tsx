@@ -57,7 +57,13 @@ export default function Nav({ logoPhoto }: { logoPhoto: string | null }) {
           })}
         </nav>
 
-        <div className="hidden lg:block shrink-0">
+        <div className="hidden lg:flex shrink-0 items-center gap-2">
+          <Link
+            href="/conta"
+            className="whitespace-nowrap font-mono-safe text-xs uppercase tracking-widest text-white hover:text-accent transition-colors px-2"
+          >
+            Minha Conta
+          </Link>
           <Link
             href="/equipes"
             className="whitespace-nowrap font-mono-safe text-xs uppercase tracking-widest border border-[#F0EBDB]/35 px-3 py-2 rounded-sm hover:border-accent hover:text-accent transition-colors"
@@ -93,6 +99,13 @@ export default function Nav({ logoPhoto }: { logoPhoto: string | null }) {
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/conta"
+            onClick={() => setOpen(false)}
+            className="mt-3 py-2.5 text-sm font-medium text-white text-center border-b border-[#F0EBDB]/10"
+          >
+            Minha Conta
+          </Link>
           <Link
             href="/equipes"
             onClick={() => setOpen(false)}

@@ -117,6 +117,56 @@ insert into matches (id, date, time, title, operation_type, location, notes) val
   ('op-2026-10-18', '2026-10-18', '19:00', 'Operação Exemplo 4', 'Noturno — Infiltração', 'Setor 2, Complexo Safe Works', 'Uso de iluminação tática obrigatório. Regras específicas no briefing.')
 on conflict (id) do nothing;
 
+-- Contas de acesso individual (login por usuário, separado do login
+-- compartilhado da equipe). Uma pessoa se cadastra sozinha e depois pede
+-- entrada em uma equipe (team_membership_requests) — a equipe aprova ou
+-- rejeita usando o login de equipe já existente.
+create table if not exists users (
+  id text primary key,
+  username text not null unique,
+  password_hash text not null, -- bcrypt, ao contrário de teams.password (ainda texto puro)
+  display_name text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table operators add column if not exists user_id text references users(id) on delete set null;
+create index if not exists operators_user_id_idx on operators(user_id);
+
+create table if not exists team_membership_requests (
+  id text primary key,
+  user_id text not null references users(id) on delete cascade,
+  team_id text not null references teams(id) on delete cascade,
+  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  requested_operator_name text,
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create index if not exists team_membership_requests_team_id_idx on team_membership_requests(team_id);
+create index if not exists team_membership_requests_user_id_idx on team_membership_requests(user_id);
+-- Garante "uma equipe por vez": no máximo uma solicitação pendente ou já
+-- aprovada por usuário. Solicitações rejeitadas ficam como histórico e não
+-- impedem pedir entrada em outra equipe depois.
+create unique index if not exists team_membership_requests_active_user_idx
+  on team_membership_requests(user_id)
+  where status in ('pending', 'approved');
+
+-- Agendamentos individuais para jogar no campo (distinto de `matches`, que
+-- são operações publicadas pela administração — aqui é o usuário pedindo seu
+-- próprio horário). Toda solicitação nasce 'pending' e só vira 'confirmed'
+-- depois de revisão da administração (ver src/lib/field-bookings.ts).
+create table if not exists field_bookings (
+  id text primary key,
+  user_id text not null references users(id) on delete cascade,
+  date date not null,
+  start_time text not null, -- "HH:mm"
+  end_time text not null, -- "HH:mm"
+  status text not null default 'pending' check (status in ('pending', 'confirmed', 'rejected', 'cancelled')),
+  created_at timestamptz not null default now()
+);
+create index if not exists field_bookings_user_id_idx on field_bookings(user_id);
+create index if not exists field_bookings_date_idx on field_bookings(date);
+create index if not exists field_bookings_status_idx on field_bookings(status);
+
 -- Seed: os briefings/comunicados de exemplo do conteúdo exclusivo.
 insert into content_items (id, date, kind, title, body) values
   ('briefing-poeira-vermelha', '2026-09-25', 'briefing', 'Briefing — Operação Poeira Vermelha', 'Cenário: disputa por três pontos de controle distribuídos entre os setores 1, 2 e 3. Reabastecimento (BB e água) liberado apenas nos pontos marcados no mapa entregue na chegada. Respawn escalonado a cada 15 minutos nas primeiras duas horas, depois passa a ser por eliminação de setor. Uso de fumaça tática liberado nos pontos de controle. Equipes devem indicar um líder de esquadrão no check-in.'),

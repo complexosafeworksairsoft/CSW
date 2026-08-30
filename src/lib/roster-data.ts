@@ -184,6 +184,18 @@ export async function getOperators(teamId: string): Promise<Operator[]> {
   return data.map(rowToOperator);
 }
 
+/** The operator row linked to an approved individual user account (see src/lib/membership.ts), or null if the user has none. */
+export async function getOperatorByUserId(userId: string): Promise<Operator | null> {
+  const { data, error } = await db()
+    .from("operators")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle<OperatorRow>();
+
+  if (error || !data) return null;
+  return rowToOperator(data);
+}
+
 /** Looks up an operator, scoped to the given team so one team can never touch another's roster. */
 export async function getOperatorForTeam(
   teamId: string,

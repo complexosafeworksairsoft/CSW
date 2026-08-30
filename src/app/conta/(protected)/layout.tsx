@@ -1,33 +1,29 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { readSessionTeamId } from "@/lib/session";
-import { findTeamById } from "@/lib/teams";
+import { readUserSessionId } from "@/lib/user-session";
+import { findUserById } from "@/lib/users";
 import { logoutAction } from "../actions";
 
-const PORTAL_LINKS = [
-  { href: "/equipes", label: "Painel" },
-  { href: "/equipes/agenda", label: "Agenda" },
-  { href: "/equipes/conteudo", label: "Conteúdo exclusivo" },
-  { href: "/equipes/ficha", label: "Ficha da Equipe" },
-  { href: "/equipes/solicitacoes", label: "Solicitações" },
+const CONTA_LINKS = [
+  { href: "/conta", label: "Perfil" },
+  { href: "/conta/agendamentos", label: "Agendamentos" },
 ];
 
-export default async function EquipesProtectedLayout({
+export default async function ContaProtectedLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const teamId = await readSessionTeamId();
-  if (!teamId) {
-    redirect("/equipes/login");
+  const userId = await readUserSessionId();
+  if (!userId) {
+    redirect("/conta/login");
   }
 
-  const team = await findTeamById(teamId);
-  if (!team) {
-    // Session cookie points at a team that no longer exists in the seed
-    // list (e.g. after editing src/lib/teams.ts) — treat as logged out.
-    redirect("/equipes/login");
+  const user = await findUserById(userId);
+  if (!user) {
+    // Session cookie points at a user that no longer exists — treat as logged out.
+    redirect("/conta/login");
   }
 
   return (
@@ -35,15 +31,15 @@ export default async function EquipesProtectedLayout({
       <div className="border-b border-line bg-surface-2">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="eyebrow">Portal de equipes</p>
+            <p className="eyebrow">Minha conta</p>
             <p className="mt-1 font-display text-lg font-semibold text-ink">
-              {team.teamName}
+              {user.displayName}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <nav className="flex flex-wrap gap-1">
-              {PORTAL_LINKS.map((link) => (
+              {CONTA_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
