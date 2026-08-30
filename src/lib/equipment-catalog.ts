@@ -92,9 +92,17 @@ export function readCatalogSelect(formData: FormData, key: string, options: read
   return options.includes(value) ? value : null;
 }
 
-export function readCatalogMulti(formData: FormData, key: string, options: readonly string[]): string[] {
-  return formData
-    .getAll(key)
-    .map((v) => String(v))
-    .filter((v) => options.includes(v));
+/**
+ * Same catalog validation as readCatalogSelect, wrapped in a 0-or-1-element
+ * array — optics/scopes/lightsLasers/muzzleDevices/stocks are stored as
+ * array columns (see Equipment in roster-data.ts), but the form only lets
+ * you pick one option per group now (a single <select>, not checkboxes: a
+ * red dot and an iron sight aren't both mounted at once). Older rows saved
+ * before that change may still hold more than one value — those still
+ * display fine (EquipmentSpecSheet just joins whatever's in the array) until
+ * the item is edited and resaved through this single-choice form.
+ */
+export function readCatalogSingle(formData: FormData, key: string, options: readonly string[]): string[] {
+  const value = readCatalogSelect(formData, key, options);
+  return value ? [value] : [];
 }

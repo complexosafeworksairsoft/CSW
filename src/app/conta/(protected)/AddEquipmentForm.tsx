@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import PhotoUploadField from "@/components/PhotoUploadField";
-import { DescriptionField, SelectField, CheckboxGroup } from "@/components/EquipmentSpecFields";
+import { DescriptionField, SelectField } from "@/components/EquipmentSpecFields";
 import { addEquipmentAction, type EquipmentActionState } from "../actions";
 import {
   WEAPON_CLASSES,
@@ -77,16 +77,16 @@ export default function AddEquipmentForm() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <CheckboxGroup legend="Red dots e holográficas" name="optics" options={RED_DOT_OPTICS} idPrefix="eq-optics" />
-            <CheckboxGroup legend="Lunetas e magnifiers" name="scopes" options={SCOPE_OPTICS} idPrefix="eq-scopes" />
+            <SelectField id="eq-optics" name="optics" label="Red dot / holográfica" options={RED_DOT_OPTICS} />
+            <SelectField id="eq-scopes" name="scopes" label="Luneta / magnifier" options={SCOPE_OPTICS} />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <CheckboxGroup legend="Luz e laser" name="lightsLasers" options={LIGHTS_LASERS} idPrefix="eq-lights" />
-            <CheckboxGroup legend="Dispositivos de cano" name="muzzleDevices" options={MUZZLE_DEVICES} idPrefix="eq-muzzle" />
+            <SelectField id="eq-lights" name="lightsLasers" label="Luz / laser" options={LIGHTS_LASERS} />
+            <SelectField id="eq-muzzle" name="muzzleDevices" label="Dispositivo de cano" options={MUZZLE_DEVICES} />
           </div>
 
-          <CheckboxGroup legend="Coronhas" name="stocks" options={STOCKS} idPrefix="eq-stocks" />
+          <SelectField id="eq-stocks" name="stocks" label="Coronha" options={STOCKS} />
 
           <div className="grid gap-3 sm:grid-cols-2">
             <SelectField id="eq-gear" name="gearRatio" label="Relação de engrenagens" options={GEAR_RATIOS} />

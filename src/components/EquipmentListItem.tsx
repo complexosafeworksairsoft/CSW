@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import PhotoTile from "./PhotoTile";
 import PhotoUploadField from "./PhotoUploadField";
 import ConfirmDeleteButton from "./ConfirmDeleteButton";
-import { DescriptionField, SelectField, CheckboxGroup } from "./EquipmentSpecFields";
+import { DescriptionField, SelectField } from "./EquipmentSpecFields";
 import type { Equipment } from "@/lib/roster-data";
 import {
   WEAPON_CLASSES,
@@ -210,45 +210,45 @@ export default function EquipmentListItem({
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <CheckboxGroup
-                legend="Red dots e holográficas"
+              <SelectField
+                id={`eq-edit-optics-${item.id}`}
                 name="optics"
+                label="Red dot / holográfica"
                 options={RED_DOT_OPTICS}
-                idPrefix={`eq-edit-optics-${item.id}`}
-                defaultValues={item.optics}
+                defaultValue={item.optics[0] ?? ""}
               />
-              <CheckboxGroup
-                legend="Lunetas e magnifiers"
+              <SelectField
+                id={`eq-edit-scopes-${item.id}`}
                 name="scopes"
+                label="Luneta / magnifier"
                 options={SCOPE_OPTICS}
-                idPrefix={`eq-edit-scopes-${item.id}`}
-                defaultValues={item.scopes}
+                defaultValue={item.scopes[0] ?? ""}
               />
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <CheckboxGroup
-                legend="Luz e laser"
+              <SelectField
+                id={`eq-edit-lights-${item.id}`}
                 name="lightsLasers"
+                label="Luz / laser"
                 options={LIGHTS_LASERS}
-                idPrefix={`eq-edit-lights-${item.id}`}
-                defaultValues={item.lightsLasers}
+                defaultValue={item.lightsLasers[0] ?? ""}
               />
-              <CheckboxGroup
-                legend="Dispositivos de cano"
+              <SelectField
+                id={`eq-edit-muzzle-${item.id}`}
                 name="muzzleDevices"
+                label="Dispositivo de cano"
                 options={MUZZLE_DEVICES}
-                idPrefix={`eq-edit-muzzle-${item.id}`}
-                defaultValues={item.muzzleDevices}
+                defaultValue={item.muzzleDevices[0] ?? ""}
               />
             </div>
 
-            <CheckboxGroup
-              legend="Coronhas"
+            <SelectField
+              id={`eq-edit-stocks-${item.id}`}
               name="stocks"
+              label="Coronha"
               options={STOCKS}
-              idPrefix={`eq-edit-stocks-${item.id}`}
-              defaultValues={item.stocks}
+              defaultValue={item.stocks[0] ?? ""}
             />
 
             <div className="grid gap-3 sm:grid-cols-2">
