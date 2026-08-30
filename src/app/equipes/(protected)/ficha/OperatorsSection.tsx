@@ -1,5 +1,4 @@
 import { MAX_OPERATORS_PER_TEAM, type Equipment, type Operator } from "@/lib/roster-data";
-import AddOperatorForm from "./AddOperatorForm";
 import OperatorCard from "./OperatorCard";
 
 type OperatorWithEquipment = Operator & { equipment: Equipment[] };
@@ -9,8 +8,6 @@ export default function OperatorsSection({
 }: {
   operators: OperatorWithEquipment[];
 }) {
-  const atLimit = operators.length >= MAX_OPERATORS_PER_TEAM;
-
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -35,15 +32,12 @@ export default function OperatorsSection({
         <p className="mt-8 text-sm text-ink-soft">Nenhum operador cadastrado ainda.</p>
       )}
 
-      <div className="mt-8">
-        {atLimit ? (
-          <p className="border border-dashed border-line-strong bg-surface px-4 py-3 font-mono-safe text-sm uppercase tracking-widest text-muted">
-            Limite de {MAX_OPERATORS_PER_TEAM} operadores atingido.
-          </p>
-        ) : (
-          <AddOperatorForm />
-        )}
-      </div>
+      <p className="mt-8 border border-dashed border-line-strong bg-surface px-4 py-3 text-sm text-ink-soft">
+        Para entrar na equipe, a pessoa precisa criar uma conta em{" "}
+        <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">Minha Conta</span> e
+        solicitar entrada direto na página pública desta equipe — a solicitação aparece em{" "}
+        <span className="font-mono-safe text-xs uppercase tracking-widest text-accent">Solicitações</span>.
+      </p>
     </div>
   );
 }

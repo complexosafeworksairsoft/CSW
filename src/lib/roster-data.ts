@@ -331,62 +331,13 @@ export async function getOperatorForTeam(
   return rowToOperator(data);
 }
 
-export type AddOperatorInput = {
-  photo: string | null;
-  photoFit?: Fit; // defaults to "cover" — omit for callers (e.g. membership.ts) that never set a photo at creation time
-  name: string;
-  tag: string;
-  startMonth: string;
-  category: string;
-  isPublic: boolean;
-};
-
-export async function addOperator(
-  teamId: string,
-  input: AddOperatorInput
-): Promise<{ ok: true; operator: Operator } | { ok: false; error: string }> {
-  const { count } = await db()
-    .from("operators")
-    .select("*", { count: "exact", head: true })
-    .eq("team_id", teamId);
-
-  if ((count ?? 0) >= MAX_OPERATORS_PER_TEAM) {
-    return {
-      ok: false,
-      error: `Limite de ${MAX_OPERATORS_PER_TEAM} operadores atingido.`,
-    };
-  }
-
-  const id = generateId("op");
-  const nowIso = new Date().toISOString();
-  const { data, error } = await db()
-    .from("operators")
-    .insert({
-      id,
-      team_id: teamId,
-      photo: input.photo,
-      photo_fit: input.photoFit ?? "cover",
-      name: input.name,
-      tag: input.tag,
-      start_month: input.startMonth,
-      category: input.category,
-      is_public: input.isPublic,
-      updated_at: nowIso,
-    })
-    .select("*")
-    .maybeSingle<OperatorRow>();
-
-  if (error || !data) {
-    return { ok: false, error: "Não foi possível adicionar o operador. Tente novamente." };
-  }
-  return { ok: true, operator: rowToOperator(data) };
-}
-
 /**
  * Moves an existing operator (one that already has an account but no team —
  * see createOperatorForApprovedUser) into a team, called from
- * src/lib/membership.ts's approveRequest. Unlike addOperator, this never
- * creates a new row — the operator already exists from account approval.
+ * src/lib/membership.ts's approveRequest. This is the ONLY way an operator
+ * joins a team's roster — teams can no longer add an operator by hand
+ * (removed along with AddOperatorForm.tsx): every operator has to come from
+ * someone registering their own account and being approved into a team.
  */
 export async function assignOperatorToTeam(
   operatorId: string,
