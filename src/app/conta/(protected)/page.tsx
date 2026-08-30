@@ -6,6 +6,7 @@ import { readUserSessionId } from "@/lib/user-session";
 import { getActiveRequestForUser } from "@/lib/membership";
 import {
   createOperatorForApprovedUser,
+  getEquipment,
   getOperatorByUserId,
   getTeamProfile,
   MAX_SCORE,
@@ -15,6 +16,7 @@ import { findUserById } from "@/lib/users";
 import { getSafetyInfo } from "@/lib/safety-info";
 import SafetyInfoForm from "./SafetyInfoForm";
 import ProfilePhotoForm from "./ProfilePhotoForm";
+import EquipmentManager from "./EquipmentManager";
 
 export const metadata: Metadata = {
   title: "Minha Conta | Safe Works",
@@ -36,12 +38,13 @@ export default async function ContaPage() {
     }
   }
 
-  const [activeRequest, team, teamProfile, allTeams, safetyInfo] = await Promise.all([
+  const [activeRequest, team, teamProfile, allTeams, safetyInfo, equipment] = await Promise.all([
     getActiveRequestForUser(userId),
     operator?.teamId ? findTeamById(operator.teamId) : Promise.resolve(null),
     operator?.teamId ? getTeamProfile(operator.teamId) : Promise.resolve(null),
     operator?.teamId ? Promise.resolve(null) : getAllTeams(),
     getSafetyInfo(userId),
+    operator ? getEquipment(operator.id) : Promise.resolve([]),
   ]);
 
   return (
@@ -152,6 +155,12 @@ export default async function ContaPage() {
           </>
         )}
       </div>
+
+      {operator && (
+        <div className="mt-8">
+          <EquipmentManager equipment={equipment} />
+        </div>
+      )}
 
       <div className="mt-8">
         <SafetyInfoForm info={safetyInfo} />

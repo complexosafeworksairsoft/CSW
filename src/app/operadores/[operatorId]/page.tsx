@@ -4,8 +4,9 @@ import PhotoTile from "@/components/PhotoTile";
 import TeamCrestPlaceholder from "@/components/TeamCrestPlaceholder";
 import ReactionBar from "@/components/ReactionBar";
 import CommentBox from "@/components/CommentBox";
+import EquipmentSpecSheet from "@/components/EquipmentSpecSheet";
 import { findTeamById } from "@/lib/teams";
-import { getOperatorById, getTeamProfile, MAX_SCORE } from "@/lib/roster-data";
+import { getEquipment, getOperatorById, getTeamProfile, MAX_SCORE } from "@/lib/roster-data";
 import { getComments, getReactionCounts } from "@/lib/engagement-data";
 
 type Params = Promise<{ operatorId: string }>;
@@ -28,11 +29,12 @@ export default async function OperatorPage({ params }: { params: Params }) {
     notFound();
   }
 
-  const [team, counts, comments, teamProfile] = await Promise.all([
+  const [team, counts, comments, teamProfile, equipment] = await Promise.all([
     operator.teamId ? findTeamById(operator.teamId) : Promise.resolve(null),
     getReactionCounts(operator.id),
     getComments(operator.id),
     operator.teamId ? getTeamProfile(operator.teamId) : Promise.resolve(null),
+    getEquipment(operator.id),
   ]);
 
   return (
@@ -98,6 +100,14 @@ export default async function OperatorPage({ params }: { params: Params }) {
             Insígnias
           </p>
           <p className="mt-2 text-sm text-muted">Nenhuma insígnia conquistada ainda.</p>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <p className="eyebrow">Ficha de Armamento</p>
+        <h2 className="mt-2 font-display text-xl font-semibold text-ink">Equipamento</h2>
+        <div className="mt-4 border border-line">
+          <EquipmentSpecSheet items={equipment} />
         </div>
       </div>
 

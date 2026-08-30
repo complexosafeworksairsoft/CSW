@@ -28,27 +28,14 @@ import {
   SHAFT_SIZES,
   BATTERIES,
   BB_WEIGHTS,
+  readCatalogSelect,
+  readCatalogMulti,
 } from "@/lib/equipment-catalog";
 
 const FICHA_PATH = "/equipes/ficha";
 
 function readFit(formData: FormData, key: string): Fit {
   return formData.get(key) === "contain" ? "contain" : "cover";
-}
-
-// The equipment spec fields are all picked from a fixed catalog
-// (src/lib/equipment-catalog.ts) — never trust a submitted value blindly,
-// only accept it if it's actually one of the known options.
-function readCatalogSelect(formData: FormData, key: string, options: readonly string[]): string | null {
-  const value = String(formData.get(key) ?? "");
-  return (options as readonly string[]).includes(value) ? value : null;
-}
-
-function readCatalogMulti(formData: FormData, key: string, options: readonly string[]): string[] {
-  return formData
-    .getAll(key)
-    .map((v) => String(v))
-    .filter((v) => (options as readonly string[]).includes(v));
 }
 
 // `resetToken` is bumped on every successful submit and left unchanged on

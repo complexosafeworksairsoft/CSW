@@ -272,6 +272,11 @@ export async function getOperatorByUserId(userId: string): Promise<Operator | nu
  * approving an account and joining a team are separate steps (see
  * src/lib/membership.ts's approveRequest, which sets team_id on this same
  * row later rather than creating a second one).
+ *
+ * is_public starts true: new operators should show up in Central de
+ * Operadores/Central do Airsoft right away instead of staying invisible
+ * until a team opts them in. A team can still flip this off per-operator
+ * via setOperatorPublic/togglePublicAction on the Ficha da Equipe.
  */
 export async function createOperatorForApprovedUser(
   userId: string,
@@ -292,7 +297,7 @@ export async function createOperatorForApprovedUser(
       tag: tag.slice(0, 40),
       start_month: "",
       category: "",
-      is_public: false,
+      is_public: true,
       score: 0,
       updated_at: nowIso,
     })

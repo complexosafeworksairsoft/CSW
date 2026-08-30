@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import PrintButton from "@/components/PrintButton";
+import EquipmentSpecSheet from "@/components/EquipmentSpecSheet";
 import { readUserSessionId } from "@/lib/user-session";
 import { findUserById } from "@/lib/users";
 import { getEquipment, getOperatorByUserId } from "@/lib/roster-data";
@@ -43,10 +44,6 @@ function DossierField({ label, value }: { label: string; value: string }) {
       <p className="mt-0.5 text-sm text-ink">{value || "Não informado"}</p>
     </div>
   );
-}
-
-function listOrNone(items: string[]): string {
-  return items.length > 0 ? items.join(" · ") : "Não informado";
 }
 
 export default async function FichaInscricaoPage() {
@@ -106,47 +103,7 @@ export default async function FichaInscricaoPage() {
           subtitle="Catálogo Padronizado de Loadout do Operador"
         />
 
-        {equipmentList.length === 0 ? (
-          <p className="bg-surface p-6 text-sm text-muted">Nenhum equipamento cadastrado ainda.</p>
-        ) : (
-          <div className="grid gap-px bg-line">
-            {equipmentList.map((item) => (
-              <div key={item.id} className="bg-surface p-5 sm:p-6">
-                <p className="font-display text-lg font-semibold text-ink">{item.name}</p>
-                {item.brand && (
-                  <p className="font-mono-safe text-xs uppercase tracking-widest text-accent">{item.brand}</p>
-                )}
-                {item.description && <p className="mt-1 text-sm text-ink-soft">{item.description}</p>}
-
-                <div className="mt-4 grid gap-px bg-line border border-line">
-                  <DossierSection title="1. Plataforma Base e Propulsão">
-                    <DossierField label="Classe da Arma" value={item.weaponClass ?? ""} />
-                    <DossierField label="Sistema de Propulsão" value={item.propulsion ?? ""} />
-                  </DossierSection>
-
-                  <DossierSection title="2. Ópticas e Miras">
-                    <DossierField label="Red Dots e Holográficas" value={listOrNone(item.optics)} />
-                    <DossierField label="Lunetas e Magnifiers" value={listOrNone(item.scopes)} />
-                  </DossierSection>
-
-                  <DossierSection title="3. Acessórios Externos e Modificações">
-                    <DossierField label="Luz e Laser" value={listOrNone(item.lightsLasers)} />
-                    <DossierField label="Dispositivos de Cano" value={listOrNone(item.muzzleDevices)} />
-                    <DossierField label="Coronhas" value={listOrNone(item.stocks)} />
-                  </DossierSection>
-
-                  <DossierSection title="4. Internos, Setup e Performance">
-                    <DossierField label="Relação de Engrenagens" value={item.gearRatio ?? ""} />
-                    <DossierField label="Tipo do Motor" value={item.motorType ?? ""} />
-                    <DossierField label="Tamanho do Eixo" value={item.shaftSize ?? ""} />
-                    <DossierField label="Bateria Utilizada" value={item.battery ?? ""} />
-                    <DossierField label="Gramatura de BBs" value={item.bbWeight ?? ""} />
-                  </DossierSection>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <EquipmentSpecSheet items={equipmentList} />
       </div>
     </section>
   );

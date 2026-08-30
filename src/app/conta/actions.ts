@@ -7,7 +7,23 @@ import { createUserSession, destroyUserSession, readUserSessionId } from "@/lib/
 import { requestMembership } from "@/lib/membership";
 import { updateSafetyInfo } from "@/lib/safety-info";
 import { readPhotoUpload } from "@/lib/photo-upload";
-import { getOperatorByUserId, updateOperatorPhoto } from "@/lib/roster-data";
+import { addEquipment, getOperatorByUserId, removeEquipment, updateOperatorPhoto } from "@/lib/roster-data";
+import {
+  WEAPON_CLASSES,
+  PROPULSION_TYPES,
+  RED_DOT_OPTICS,
+  SCOPE_OPTICS,
+  LIGHTS_LASERS,
+  MUZZLE_DEVICES,
+  STOCKS,
+  GEAR_RATIOS,
+  MOTOR_TYPES,
+  SHAFT_SIZES,
+  BATTERIES,
+  BB_WEIGHTS,
+  readCatalogSelect,
+  readCatalogMulti,
+} from "@/lib/equipment-catalog";
 
 export type AuthState = {
   error: string | null;
@@ -179,4 +195,104 @@ export async function updateProfilePhotoAction(
   revalidatePath("/conta/ficha");
   revalidatePath("/operadores");
   return { error: null };
+}
+
+// `resetToken` is bumped on every successful submit and left unchanged on
+// error — same convention as src/app/equipes/roster-actions.ts's
+// ActionState, which the add-equipment form uses as a React `key` to reset
+// its (uncontrolled) fields after a successful add.
+export type EquipmentActionState = {
+  error: string | null;
+  resetToken: number;
+};
+
+function readFit(formData: FormData, key: string): "cover" | "contain" {
+  return formData.get(key) === "contain" ? "contain" : "cover";
+}
+
+/**
+ * Lets the account owner add their own equipment — separate from
+ * addEquipment's team-portal caller (roster-actions.ts's addEquipmentAction),
+ * which resolves the operator by teamId; this one resolves it by the logged-
+ * in userId instead, so an operator can describe their own loadout without
+ * needing their team to do it for them.
+ */
+export async function addEquipmentAction(
+  prevState: EquipmentActionState,
+  formData: FormData
+): Promise<EquipmentActionState> {
+  const userId = await readUserSessionId();
+  if (!userId) {
+    redirect("/conta/login");
+  }
+
+  const operator = await getOperatorByUserId(userId);
+  if (!operator) {
+    return { error: "Operador não encontrado para esta conta.", resetToken: prevState.resetToken };
+  }
+
+  const photoResult = await readPhotoUpload(formData.get("photo"), "square", readFit(formData, "photoFit"));
+  if (photoResult.kind === "error") {
+    return { error: photoResult.message, resetToken: prevState.resetToken };
+  }
+
+  const name = String(formData.get("name") ?? "").trim();
+  const brand = String(formData.get("brand") ?? "").trim();
+  const description = String(formData.get("description") ?? "")
+    .trim()
+    .slice(0, 200);
+
+  if (!name) {
+    return { error: "Informe ao menos o nome do equipamento.", resetToken: prevState.resetToken };
+  }
+
+  const result = await addEquipment(operator.id, {
+    photo: photoResult.kind === "ok" ? photoResult.dataUri : null,
+    photoFit: photoResult.kind === "ok" ? photoResult.fit : undefined,
+    name: name.slice(0, 120),
+    brand: brand.slice(0, 80),
+    description,
+    weaponClass: readCatalogSelect(formData, "weaponClass", WEAPON_CLASSES),
+    propulsion: readCatalogSelect(formData, "propulsion", PROPULSION_TYPES),
+    optics: readCatalogMulti(formData, "optics", RED_DOT_OPTICS),
+    scopes: readCatalogMulti(formData, "scopes", SCOPE_OPTICS),
+    lightsLasers: readCatalogMulti(formData, "lightsLasers", LIGHTS_LASERS),
+    muzzleDevices: readCatalogMulti(formData, "muzzleDevices", MUZZLE_DEVICES),
+    stocks: readCatalogMulti(formData, "stocks", STOCKS),
+    gearRatio: readCatalogSelect(formData, "gearRatio", GEAR_RATIOS),
+    motorType: readCatalogSelect(formData, "motorType", MOTOR_TYPES),
+    shaftSize: readCatalogSelect(formData, "shaftSize", SHAFT_SIZES),
+    battery: readCatalogSelect(formData, "battery", BATTERIES),
+    bbWeight: readCatalogSelect(formData, "bbWeight", BB_WEIGHTS),
+  });
+
+  if (!result.ok) {
+    return { error: result.error, resetToken: prevState.resetToken };
+  }
+
+  revalidatePath("/conta");
+  revalidatePath("/conta/ficha");
+  revalidatePath("/operadores");
+  revalidatePath("/central-do-airsoft");
+  revalidatePath(`/operadores/${operator.id}`);
+  return { error: null, resetToken: prevState.resetToken + 1 };
+}
+
+/** Removes one of the account owner's own equipment items — scoped to their own operatorId, resolved by userId, same as addEquipmentAction above. */
+export async function removeEquipmentAction(formData: FormData): Promise<void> {
+  const userId = await readUserSessionId();
+  if (!userId) {
+    redirect("/conta/login");
+  }
+
+  const operator = await getOperatorByUserId(userId);
+  const equipmentId = String(formData.get("equipmentId") ?? "");
+  if (operator && equipmentId) {
+    await removeEquipment(operator.id, equipmentId);
+  }
+
+  revalidatePath("/conta");
+  revalidatePath("/conta/ficha");
+  revalidatePath("/operadores");
+  if (operator) revalidatePath(`/operadores/${operator.id}`);
 }

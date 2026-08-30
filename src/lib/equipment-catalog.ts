@@ -80,3 +80,21 @@ export const SHAFT_SIZES = ["Eixo Longo", "Eixo Médio", "Eixo Curto"] as const;
 export const BATTERIES = ["LiPo 7.4v", "LiPo 11.1v", "Li-Ion 7.4v", "Li-Ion 11.1v", "NiMH / LiFe"] as const;
 
 export const BB_WEIGHTS = ["0.20g / 0.23g", "0.25g / 0.28g", "0.30g / 0.32g", "0.36g / 0.40g+"] as const;
+
+// Every equipment spec field is picked from one of the fixed lists above —
+// never trust a submitted value blindly, only accept it if it's actually one
+// of the known options. Shared between the team portal's equipment form
+// (src/app/equipes/roster-actions.ts) and the operator's own self-service
+// form (src/app/conta/actions.ts), which both write to the same `equipment`
+// table.
+export function readCatalogSelect(formData: FormData, key: string, options: readonly string[]): string | null {
+  const value = String(formData.get(key) ?? "");
+  return options.includes(value) ? value : null;
+}
+
+export function readCatalogMulti(formData: FormData, key: string, options: readonly string[]): string[] {
+  return formData
+    .getAll(key)
+    .map((v) => String(v))
+    .filter((v) => options.includes(v));
+}

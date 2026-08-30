@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import PhotoUploadField from "@/components/PhotoUploadField";
 import { DescriptionField, SelectField, CheckboxGroup } from "@/components/EquipmentSpecFields";
-import { addEquipmentAction, type ActionState } from "../../roster-actions";
+import { addEquipmentAction, type EquipmentActionState } from "../actions";
 import {
   WEAPON_CLASSES,
   PROPULSION_TYPES,
@@ -19,15 +19,13 @@ import {
   BB_WEIGHTS,
 } from "@/lib/equipment-catalog";
 
-const initialState: ActionState = { error: null, resetToken: 0 };
+const initialState: EquipmentActionState = { error: null, resetToken: 0 };
 
-export default function AddEquipmentForm({ operatorId }: { operatorId: string }) {
+export default function AddEquipmentForm() {
   const [state, formAction, pending] = useActionState(addEquipmentAction, initialState);
 
   return (
     <form action={formAction} className="border border-dashed border-line-strong bg-surface-2 p-4">
-      <input type="hidden" name="operatorId" value={operatorId} />
-
       <p className="font-mono-safe text-[11px] uppercase tracking-widest text-ink-soft">
         Adicionar equipamento
       </p>
@@ -39,14 +37,11 @@ export default function AddEquipmentForm({ operatorId }: { operatorId: string })
         <div className="grid gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label
-                htmlFor={`eq-name-${operatorId}`}
-                className="font-mono-safe text-[11px] uppercase tracking-widest text-ink-soft"
-              >
+              <label htmlFor="eq-name" className="font-mono-safe text-[11px] uppercase tracking-widest text-ink-soft">
                 Nome
               </label>
               <input
-                id={`eq-name-${operatorId}`}
+                id="eq-name"
                 name="name"
                 type="text"
                 required
@@ -54,14 +49,11 @@ export default function AddEquipmentForm({ operatorId }: { operatorId: string })
               />
             </div>
             <div>
-              <label
-                htmlFor={`eq-brand-${operatorId}`}
-                className="font-mono-safe text-[11px] uppercase tracking-widest text-ink-soft"
-              >
+              <label htmlFor="eq-brand" className="font-mono-safe text-[11px] uppercase tracking-widest text-ink-soft">
                 Marca
               </label>
               <input
-                id={`eq-brand-${operatorId}`}
+                id="eq-brand"
                 name="brand"
                 type="text"
                 className="mt-1 w-full rounded-sm border border-line-strong bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
@@ -69,7 +61,7 @@ export default function AddEquipmentForm({ operatorId }: { operatorId: string })
             </div>
           </div>
 
-          <DescriptionField id={`eq-desc-${operatorId}`} />
+          <DescriptionField id="eq-desc" />
         </div>
       </div>
 
@@ -80,63 +72,28 @@ export default function AddEquipmentForm({ operatorId }: { operatorId: string })
 
         <div className="mt-3 grid gap-4">
           <div className="grid gap-3 sm:grid-cols-2">
-            <SelectField
-              id={`eq-weapon-class-${operatorId}`}
-              name="weaponClass"
-              label="Classe da arma"
-              options={WEAPON_CLASSES}
-            />
-            <SelectField
-              id={`eq-propulsion-${operatorId}`}
-              name="propulsion"
-              label="Sistema de propulsão"
-              options={PROPULSION_TYPES}
-            />
+            <SelectField id="eq-weapon-class" name="weaponClass" label="Classe da arma" options={WEAPON_CLASSES} />
+            <SelectField id="eq-propulsion" name="propulsion" label="Sistema de propulsão" options={PROPULSION_TYPES} />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <CheckboxGroup
-              legend="Red dots e holográficas"
-              name="optics"
-              options={RED_DOT_OPTICS}
-              idPrefix={`eq-optics-${operatorId}`}
-            />
-            <CheckboxGroup
-              legend="Lunetas e magnifiers"
-              name="scopes"
-              options={SCOPE_OPTICS}
-              idPrefix={`eq-scopes-${operatorId}`}
-            />
+            <CheckboxGroup legend="Red dots e holográficas" name="optics" options={RED_DOT_OPTICS} idPrefix="eq-optics" />
+            <CheckboxGroup legend="Lunetas e magnifiers" name="scopes" options={SCOPE_OPTICS} idPrefix="eq-scopes" />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <CheckboxGroup
-              legend="Luz e laser"
-              name="lightsLasers"
-              options={LIGHTS_LASERS}
-              idPrefix={`eq-lights-${operatorId}`}
-            />
-            <CheckboxGroup
-              legend="Dispositivos de cano"
-              name="muzzleDevices"
-              options={MUZZLE_DEVICES}
-              idPrefix={`eq-muzzle-${operatorId}`}
-            />
+            <CheckboxGroup legend="Luz e laser" name="lightsLasers" options={LIGHTS_LASERS} idPrefix="eq-lights" />
+            <CheckboxGroup legend="Dispositivos de cano" name="muzzleDevices" options={MUZZLE_DEVICES} idPrefix="eq-muzzle" />
           </div>
 
-          <CheckboxGroup legend="Coronhas" name="stocks" options={STOCKS} idPrefix={`eq-stocks-${operatorId}`} />
+          <CheckboxGroup legend="Coronhas" name="stocks" options={STOCKS} idPrefix="eq-stocks" />
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <SelectField
-              id={`eq-gear-${operatorId}`}
-              name="gearRatio"
-              label="Relação de engrenagens"
-              options={GEAR_RATIOS}
-            />
-            <SelectField id={`eq-motor-${operatorId}`} name="motorType" label="Tipo do motor" options={MOTOR_TYPES} />
-            <SelectField id={`eq-shaft-${operatorId}`} name="shaftSize" label="Tamanho do eixo" options={SHAFT_SIZES} />
-            <SelectField id={`eq-battery-${operatorId}`} name="battery" label="Bateria utilizada" options={BATTERIES} />
-            <SelectField id={`eq-bb-${operatorId}`} name="bbWeight" label="Gramatura de BBs" options={BB_WEIGHTS} />
+            <SelectField id="eq-gear" name="gearRatio" label="Relação de engrenagens" options={GEAR_RATIOS} />
+            <SelectField id="eq-motor" name="motorType" label="Tipo do motor" options={MOTOR_TYPES} />
+            <SelectField id="eq-shaft" name="shaftSize" label="Tamanho do eixo" options={SHAFT_SIZES} />
+            <SelectField id="eq-battery" name="battery" label="Bateria utilizada" options={BATTERIES} />
+            <SelectField id="eq-bb" name="bbWeight" label="Gramatura de BBs" options={BB_WEIGHTS} />
           </div>
         </div>
       </details>
