@@ -1,8 +1,8 @@
 import ImagePlaceholder from "@/components/ImagePlaceholder";
-import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
+import EquipmentListItem from "@/components/EquipmentListItem";
 import type { Fit } from "@/lib/image-processing";
 import { MAX_EQUIPMENT_PER_OPERATOR, type Equipment, type Operator } from "@/lib/roster-data";
-import { removeEquipmentAction } from "../../roster-actions";
+import { removeEquipmentAction, updateEquipmentAction } from "../../roster-actions";
 import AddEquipmentForm from "./AddEquipmentForm";
 import OperatorActions from "./OperatorActions";
 
@@ -104,53 +104,13 @@ export default function OperatorCard({ operator }: { operator: OperatorWithEquip
         {operator.equipment.length > 0 && (
           <ul className="mt-3 grid gap-3">
             {operator.equipment.map((item) => (
-              <li key={item.id} className="border border-line bg-surface-2 p-3">
-                <div className="flex gap-3">
-                  <PhotoTile photo={item.photo} fit={item.photoFit} label={`Foto: ${item.name}`} className="w-14 shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-ink truncate">{item.name}</p>
-                    {item.brand && (
-                      <p className="font-mono-safe text-[11px] uppercase tracking-widest text-muted">
-                        {item.brand}
-                      </p>
-                    )}
-                    {item.description && (
-                      <p className="mt-1 text-xs text-ink-soft break-words">{item.description}</p>
-                    )}
-                    {(item.weaponClass || item.propulsion) && (
-                      <p className="mt-1.5 flex flex-wrap gap-1">
-                        {item.weaponClass && (
-                          <span className="rounded-sm border border-line-strong px-1.5 py-0.5 font-mono-safe text-[10px] uppercase tracking-widest text-ink-soft">
-                            {item.weaponClass}
-                          </span>
-                        )}
-                        {item.propulsion && (
-                          <span className="rounded-sm border border-line-strong px-1.5 py-0.5 font-mono-safe text-[10px] uppercase tracking-widest text-ink-soft">
-                            {item.propulsion}
-                          </span>
-                        )}
-                      </p>
-                    )}
-                    {[...item.optics, ...item.scopes, ...item.lightsLasers, ...item.muzzleDevices, ...item.stocks]
-                      .length > 0 && (
-                      <p className="mt-1 text-[11px] text-muted break-words">
-                        {[...item.optics, ...item.scopes, ...item.lightsLasers, ...item.muzzleDevices, ...item.stocks].join(
-                          " · "
-                        )}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <form action={removeEquipmentAction} className="mt-2">
-                  <input type="hidden" name="operatorId" value={operator.id} />
-                  <input type="hidden" name="equipmentId" value={item.id} />
-                  <ConfirmDeleteButton
-                    label="Excluir"
-                    confirmMessage="Tem certeza que deseja excluir este equipamento? Essa ação não pode ser desfeita."
-                    size="sm"
-                  />
-                </form>
-              </li>
+              <EquipmentListItem
+                key={item.id}
+                item={item}
+                operatorId={operator.id}
+                updateAction={updateEquipmentAction}
+                removeAction={removeEquipmentAction}
+              />
             ))}
           </ul>
         )}

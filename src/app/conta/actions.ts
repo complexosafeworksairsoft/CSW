@@ -7,7 +7,13 @@ import { createUserSession, destroyUserSession, readUserSessionId } from "@/lib/
 import { requestMembership } from "@/lib/membership";
 import { updateSafetyInfo } from "@/lib/safety-info";
 import { readPhotoUpload } from "@/lib/photo-upload";
-import { addEquipment, getOperatorByUserId, removeEquipment, updateOperatorPhoto } from "@/lib/roster-data";
+import {
+  addEquipment,
+  getOperatorByUserId,
+  removeEquipment,
+  updateEquipment,
+  updateOperatorPhoto,
+} from "@/lib/roster-data";
 import {
   WEAPON_CLASSES,
   PROPULSION_TYPES,
@@ -249,6 +255,72 @@ export async function addEquipmentAction(
   const result = await addEquipment(operator.id, {
     photo: photoResult.kind === "ok" ? photoResult.dataUri : null,
     photoFit: photoResult.kind === "ok" ? photoResult.fit : undefined,
+    name: name.slice(0, 120),
+    brand: brand.slice(0, 80),
+    description,
+    weaponClass: readCatalogSelect(formData, "weaponClass", WEAPON_CLASSES),
+    propulsion: readCatalogSelect(formData, "propulsion", PROPULSION_TYPES),
+    optics: readCatalogMulti(formData, "optics", RED_DOT_OPTICS),
+    scopes: readCatalogMulti(formData, "scopes", SCOPE_OPTICS),
+    lightsLasers: readCatalogMulti(formData, "lightsLasers", LIGHTS_LASERS),
+    muzzleDevices: readCatalogMulti(formData, "muzzleDevices", MUZZLE_DEVICES),
+    stocks: readCatalogMulti(formData, "stocks", STOCKS),
+    gearRatio: readCatalogSelect(formData, "gearRatio", GEAR_RATIOS),
+    motorType: readCatalogSelect(formData, "motorType", MOTOR_TYPES),
+    shaftSize: readCatalogSelect(formData, "shaftSize", SHAFT_SIZES),
+    battery: readCatalogSelect(formData, "battery", BATTERIES),
+    bbWeight: readCatalogSelect(formData, "bbWeight", BB_WEIGHTS),
+  });
+
+  if (!result.ok) {
+    return { error: result.error, resetToken: prevState.resetToken };
+  }
+
+  revalidatePath("/conta");
+  revalidatePath("/conta/ficha");
+  revalidatePath("/operadores");
+  revalidatePath("/central-do-airsoft");
+  revalidatePath(`/operadores/${operator.id}`);
+  return { error: null, resetToken: prevState.resetToken + 1 };
+}
+
+/** Edits one of the account owner's own equipment items — same idea as addEquipmentAction, but updates an existing row (scoped to their own operatorId, resolved by userId) instead of inserting a new one. */
+export async function updateEquipmentAction(
+  prevState: EquipmentActionState,
+  formData: FormData
+): Promise<EquipmentActionState> {
+  const userId = await readUserSessionId();
+  if (!userId) {
+    redirect("/conta/login");
+  }
+
+  const operator = await getOperatorByUserId(userId);
+  if (!operator) {
+    return { error: "Operador não encontrado para esta conta.", resetToken: prevState.resetToken };
+  }
+
+  const equipmentId = String(formData.get("equipmentId") ?? "");
+  if (!equipmentId) {
+    return { error: "Equipamento não encontrado.", resetToken: prevState.resetToken };
+  }
+
+  const photoResult = await readPhotoUpload(formData.get("photo"), "square", readFit(formData, "photoFit"));
+  if (photoResult.kind === "error") {
+    return { error: photoResult.message, resetToken: prevState.resetToken };
+  }
+
+  const name = String(formData.get("name") ?? "").trim();
+  const brand = String(formData.get("brand") ?? "").trim();
+  const description = String(formData.get("description") ?? "")
+    .trim()
+    .slice(0, 200);
+
+  if (!name) {
+    return { error: "Informe ao menos o nome do equipamento.", resetToken: prevState.resetToken };
+  }
+
+  const result = await updateEquipment(operator.id, equipmentId, {
+    ...(photoResult.kind === "ok" ? { photo: photoResult.dataUri, photoFit: photoResult.fit } : {}),
     name: name.slice(0, 120),
     brand: brand.slice(0, 80),
     description,

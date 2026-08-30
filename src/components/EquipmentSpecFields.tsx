@@ -11,8 +11,8 @@ const DESCRIPTION_MAX = 200;
  * Shared between the team's AddEquipmentForm and the operator's own
  * self-service equipment form (src/app/conta/(protected)/AddEquipmentForm.tsx).
  */
-export function DescriptionField({ id }: { id: string }) {
-  const [value, setValue] = useState("");
+export function DescriptionField({ id, defaultValue = "" }: { id: string; defaultValue?: string }) {
+  const [value, setValue] = useState(defaultValue);
 
   return (
     <div>
@@ -45,11 +45,13 @@ export function SelectField({
   name,
   label,
   options,
+  defaultValue = "",
 }: {
   id: string;
   name: string;
   label: string;
   options: readonly string[];
+  defaultValue?: string;
 }) {
   return (
     <div>
@@ -59,7 +61,7 @@ export function SelectField({
       <select
         id={id}
         name={name}
-        defaultValue=""
+        defaultValue={defaultValue}
         className="mt-1 w-full rounded-sm border border-line-strong bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
       >
         <option value="">Não informado</option>
@@ -78,11 +80,13 @@ export function CheckboxGroup({
   name,
   options,
   idPrefix,
+  defaultValues = [],
 }: {
   legend: string;
   name: string;
   options: readonly string[];
   idPrefix: string;
+  defaultValues?: readonly string[];
 }) {
   return (
     <fieldset>
@@ -99,6 +103,7 @@ export function CheckboxGroup({
                 type="checkbox"
                 name={name}
                 value={option}
+                defaultChecked={defaultValues.includes(option)}
                 className="h-3.5 w-3.5 shrink-0 rounded-sm border border-line-strong bg-surface accent-accent"
               />
               {option}

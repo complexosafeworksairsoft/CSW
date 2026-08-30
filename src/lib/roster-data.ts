@@ -575,6 +575,68 @@ export async function addEquipment(
   return { ok: true, equipment: rowToEquipment(data) };
 }
 
+export type UpdateEquipmentInput = {
+  photo?: string | null; // only overwritten when explicitly present — a new upload — same convention as UpdateOperatorInput; omit to keep the item's current photo
+  photoFit?: Fit;
+  name: string;
+  brand: string;
+  description: string;
+  weaponClass?: string | null;
+  propulsion?: string | null;
+  optics?: string[];
+  scopes?: string[];
+  lightsLasers?: string[];
+  muzzleDevices?: string[];
+  stocks?: string[];
+  gearRatio?: string | null;
+  motorType?: string | null;
+  shaftSize?: string | null;
+  battery?: string | null;
+  bbWeight?: string | null;
+};
+
+/**
+ * Edits an existing equipment item in place (scoped to its operator, same as
+ * addEquipment/removeEquipment) — operators change loadouts often enough
+ * that deleting and re-adding every time wasn't cutting it.
+ */
+export async function updateEquipment(
+  operatorId: string,
+  equipmentId: string,
+  input: UpdateEquipmentInput
+): Promise<{ ok: true; equipment: Equipment } | { ok: false; error: string }> {
+  const { data, error } = await db()
+    .from("equipment")
+    .update({
+      ...(input.photo !== undefined ? { photo: input.photo, photo_fit: input.photoFit ?? "cover" } : {}),
+      name: input.name,
+      brand: input.brand,
+      description: input.description,
+      weapon_class: input.weaponClass ?? null,
+      propulsion: input.propulsion ?? null,
+      optics: input.optics ?? [],
+      scopes: input.scopes ?? [],
+      lights_lasers: input.lightsLasers ?? [],
+      muzzle_devices: input.muzzleDevices ?? [],
+      stocks: input.stocks ?? [],
+      gear_ratio: input.gearRatio ?? null,
+      motor_type: input.motorType ?? null,
+      shaft_size: input.shaftSize ?? null,
+      battery: input.battery ?? null,
+      bb_weight: input.bbWeight ?? null,
+    })
+    .eq("id", equipmentId)
+    .eq("operator_id", operatorId)
+    .select("*")
+    .maybeSingle<EquipmentRow>();
+
+  if (error || !data) {
+    return { ok: false, error: "Equipamento não encontrado." };
+  }
+  await touchOperator(operatorId);
+  return { ok: true, equipment: rowToEquipment(data) };
+}
+
 export async function removeEquipment(operatorId: string, equipmentId: string): Promise<void> {
   await db().from("equipment").delete().eq("id", equipmentId).eq("operator_id", operatorId);
   await touchOperator(operatorId);
