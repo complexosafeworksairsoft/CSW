@@ -433,7 +433,6 @@ async function touchOperator(operatorId: string): Promise<void> {
     .eq("id", operatorId);
 }
 
-/** Flips (or explicitly sets) an operator's public/private flag, scoped to the team. */
 /** Admin-only: sets an operator's graduação (0-1000). Not team-scoped — this is the site admin's call, not the team's. Clamped defensively even though the DB column already has a check constraint. */
 export async function setOperatorScore(operatorId: string, score: number): Promise<Operator | null> {
   const clamped = Math.max(0, Math.min(MAX_SCORE, Math.round(score)));
@@ -448,6 +447,30 @@ export async function setOperatorScore(operatorId: string, score: number): Promi
   return rowToOperator(data);
 }
 
+/**
+ * Lets the account owner set their own operator photo from /conta —
+ * intentionally not team-scoped (unlike updateOperator, which is what the
+ * team's own Ficha da Equipe uses): the caller already resolved this
+ * operatorId via getOperatorByUserId(userId), so it's already scoped to
+ * "your own operator" by construction.
+ */
+export async function updateOperatorPhoto(
+  operatorId: string,
+  photo: string,
+  photoFit: Fit
+): Promise<Operator | null> {
+  const { data, error } = await db()
+    .from("operators")
+    .update({ photo, photo_fit: photoFit, updated_at: new Date().toISOString() })
+    .eq("id", operatorId)
+    .select("*")
+    .maybeSingle<OperatorRow>();
+
+  if (error || !data) return null;
+  return rowToOperator(data);
+}
+
+/** Flips (or explicitly sets) an operator's public/private flag, scoped to the team. */
 export async function setOperatorPublic(
   teamId: string,
   operatorId: string,

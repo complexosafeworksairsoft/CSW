@@ -14,6 +14,7 @@ import { findTeamById, getAllTeams } from "@/lib/teams";
 import { findUserById } from "@/lib/users";
 import { getSafetyInfo } from "@/lib/safety-info";
 import SafetyInfoForm from "./SafetyInfoForm";
+import ProfilePhotoForm from "./ProfilePhotoForm";
 
 export const metadata: Metadata = {
   title: "Minha Conta | Safe Works",
@@ -45,6 +46,12 @@ export default async function ContaPage() {
 
   return (
     <section className="mx-auto max-w-2xl px-4 sm:px-6 py-12">
+      {operator && (
+        <div className="mb-6">
+          <ProfilePhotoForm existingPhoto={operator.photo} existingFit={operator.photoFit} />
+        </div>
+      )}
+
       <div className="flex items-center gap-4">
         {teamProfile?.photo ? (
           <PhotoTile

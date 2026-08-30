@@ -6,6 +6,8 @@ import { createUser, findUserByCredentials } from "@/lib/users";
 import { createUserSession, destroyUserSession, readUserSessionId } from "@/lib/user-session";
 import { requestMembership } from "@/lib/membership";
 import { updateSafetyInfo } from "@/lib/safety-info";
+import { readPhotoUpload } from "@/lib/photo-upload";
+import { getOperatorByUserId, updateOperatorPhoto } from "@/lib/roster-data";
 
 export type AuthState = {
   error: string | null;
@@ -142,4 +144,39 @@ export async function updateSafetyInfoAction(
 
   revalidatePath("/conta");
   return { error: null, saved: true };
+}
+
+export type ProfilePhotoState = {
+  error: string | null;
+};
+
+/** Lets the logged-in account owner set their own operator photo — separate from updateOperator, which only the team's own Ficha da Equipe can call. */
+export async function updateProfilePhotoAction(
+  _prevState: ProfilePhotoState,
+  formData: FormData
+): Promise<ProfilePhotoState> {
+  const userId = await readUserSessionId();
+  if (!userId) {
+    redirect("/conta/login");
+  }
+
+  const operator = await getOperatorByUserId(userId);
+  if (!operator) {
+    return { error: "Operador não encontrado para esta conta." };
+  }
+
+  const photoResult = await readPhotoUpload(formData.get("photo"), "square", formData.get("photoFit") === "contain" ? "contain" : "cover");
+  if (photoResult.kind === "error") {
+    return { error: photoResult.message };
+  }
+  if (photoResult.kind === "none") {
+    return { error: "Selecione uma foto para enviar." };
+  }
+
+  await updateOperatorPhoto(operator.id, photoResult.dataUri, photoResult.fit);
+
+  revalidatePath("/conta");
+  revalidatePath("/conta/ficha");
+  revalidatePath("/operadores");
+  return { error: null };
 }

@@ -7,6 +7,7 @@ import { logoutAction } from "../actions";
 
 const CONTA_LINKS = [
   { href: "/conta", label: "Perfil" },
+  { href: "/conta/ficha", label: "Ficha de Inscrição" },
   { href: "/conta/agendamentos", label: "Agendamentos" },
 ];
 
