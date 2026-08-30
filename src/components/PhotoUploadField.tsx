@@ -83,6 +83,16 @@ export default function PhotoUploadField({
           />
         )}
 
+        {preview && fit === "contain" && (
+          // eslint-disable-next-line @next/next/no-img-element -- prototype preview from a blob:/data: URI, see ImagePlaceholder.tsx for the swap-to-next/image note
+          <img
+            src={preview}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-lg"
+          />
+        )}
+
         {preview && (
           // eslint-disable-next-line @next/next/no-img-element -- prototype preview from a blob:/data: URI, see ImagePlaceholder.tsx for the swap-to-next/image note
           <img

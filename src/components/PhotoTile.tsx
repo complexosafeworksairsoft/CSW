@@ -43,6 +43,18 @@ export default function PhotoTile({
     <div
       className={`relative overflow-hidden border border-line-strong bg-surface-2 ${RATIO_CLASS[ratio]} ${className}`}
     >
+      {/* "contain" letterboxes the photo, so a blurred, oversized copy of
+          the same photo fills the gap instead of the tile's flat background
+          color showing through as a hard bar. */}
+      {fit === "contain" && (
+        // eslint-disable-next-line @next/next/no-img-element -- prototype data-URI photo, see ImagePlaceholder.tsx for the swap-to-next/image note
+        <img
+          src={photo}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-lg"
+        />
+      )}
       {/* eslint-disable-next-line @next/next/no-img-element -- prototype data-URI photo, see ImagePlaceholder.tsx for the swap-to-next/image note */}
       <img
         src={photo}

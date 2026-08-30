@@ -45,6 +45,15 @@ function PhotoTile({
   }
   return (
     <div className={`relative aspect-square overflow-hidden border border-line-strong bg-surface-2 ${className}`}>
+      {fit === "contain" && (
+        // eslint-disable-next-line @next/next/no-img-element -- prototype data-URI photo, see ImagePlaceholder.tsx for the swap-to-next/image note
+        <img
+          src={photo}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-lg"
+        />
+      )}
       {/* eslint-disable-next-line @next/next/no-img-element -- prototype data-URI photo, see ImagePlaceholder.tsx for the swap-to-next/image note */}
       <img
         src={photo}
