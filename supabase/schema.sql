@@ -29,7 +29,7 @@ create table if not exists team_profiles (
 
 create table if not exists operators (
   id text primary key,
-  team_id text not null references teams(id) on delete cascade,
+  team_id text references teams(id) on delete cascade, -- null: operador aprovado mas ainda sem equipe
   photo text,
   photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain')),
   name text not null,
@@ -37,6 +37,7 @@ create table if not exists operators (
   start_month text not null default '', -- "AAAA-MM"
   category text not null default '',
   is_public boolean not null default false,
+  score integer not null default 0 check (score >= 0 and score <= 1000),
   updated_at timestamptz not null default now(),
   created_at timestamptz not null default now()
 );
@@ -130,6 +131,7 @@ create table if not exists users (
   username text not null unique,
   password_hash text not null, -- bcrypt, ao contrário de teams.password (ainda texto puro)
   display_name text not null,
+  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   created_at timestamptz not null default now()
 );
 
@@ -179,6 +181,22 @@ alter table site_images add column if not exists fit text not null default 'cove
 alter table team_profiles add column if not exists photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain'));
 alter table operators add column if not exists photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain'));
 alter table equipment add column if not exists photo_fit text not null default 'cover' check (photo_fit in ('cover', 'contain'));
+
+-- Conta de usuário precisa de aprovação do admin antes de poder logar (ver
+-- src/lib/users.ts). 'pending' é o estado inicial de todo cadastro novo.
+alter table users add column if not exists status text not null default 'pending' check (status in ('pending', 'approved', 'rejected'));
+create index if not exists users_status_idx on users(status);
+
+-- Graduação do operador (0-1000), definida manualmente pelo admin por
+-- enquanto — critérios automáticos de pontuação ficam para uma etapa
+-- futura (ver src/app/operadores/[operatorId]/page.tsx).
+alter table operators add column if not exists score integer not null default 0 check (score >= 0 and score <= 1000);
+
+-- O operador passa a existir desde a aprovação da CONTA (ver
+-- src/app/equipes/admin/account-actions.ts), não mais só quando entra numa
+-- equipe — a equipe é apenas um agrupamento de operadores. team_id passa a
+-- aceitar null (operador ainda sem equipe).
+alter table operators alter column team_id drop not null;
 
 -- Seed: os briefings/comunicados de exemplo do conteúdo exclusivo.
 insert into content_items (id, date, kind, title, body) values

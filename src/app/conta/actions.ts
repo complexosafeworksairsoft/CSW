@@ -10,29 +10,38 @@ export type AuthState = {
   error: string | null;
 };
 
+// Registering does NOT log the person in — every new account starts
+// 'pending' (see src/lib/users.ts) and needs an admin to approve it first
+// (src/app/equipes/admin/account-actions.ts). `submitted` tells
+// RegisterForm.tsx to show a "aguardando aprovação" message instead of the
+// error UI or a redirect.
+export type RegisterState = {
+  error: string | null;
+  submitted: boolean;
+};
+
 export async function registerAction(
-  _prevState: AuthState,
+  _prevState: RegisterState,
   formData: FormData
-): Promise<AuthState> {
+): Promise<RegisterState> {
   const username = String(formData.get("username") ?? "").trim();
   const displayName = String(formData.get("displayName") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
   if (!username || !displayName || !password) {
-    return { error: "Preencha todos os campos." };
+    return { error: "Preencha todos os campos.", submitted: false };
   }
   if (password !== confirmPassword) {
-    return { error: "As senhas não coincidem." };
+    return { error: "As senhas não coincidem.", submitted: false };
   }
 
   const result = await createUser({ username, password, displayName });
   if (!result.ok) {
-    return { error: result.error };
+    return { error: result.error, submitted: false };
   }
 
-  await createUserSession(result.user.id);
-  redirect("/conta");
+  return { error: null, submitted: true };
 }
 
 export async function loginAction(
@@ -49,6 +58,12 @@ export async function loginAction(
   const user = await findUserByCredentials(username, password);
   if (!user) {
     return { error: "Usuário ou senha inválidos." };
+  }
+  if (user.status === "pending") {
+    return { error: "Sua conta ainda está aguardando aprovação da administração." };
+  }
+  if (user.status === "rejected") {
+    return { error: "Seu cadastro não foi aprovado. Fale com a administração do Complexo." };
   }
 
   await createUserSession(user.id);

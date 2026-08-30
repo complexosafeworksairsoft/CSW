@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import { readAdminSession } from "@/lib/admin-session";
 import { getSiteImageWithFit, SITE_IMAGE_SLOTS } from "@/lib/site-images";
 import { getAllTeams } from "@/lib/teams";
-import { getAllUsers } from "@/lib/users";
+import { getAllUsers, getPendingUsers } from "@/lib/users";
 import { getAllActiveRequests } from "@/lib/membership";
 import { getPendingBookings } from "@/lib/field-bookings";
+import { getAllOperators } from "@/lib/roster-data";
 import { logoutAdminAction } from "../admin-actions";
 import AdminSlotCard from "./AdminSlotCard";
 import TeamList from "./TeamList";
@@ -13,6 +14,8 @@ import CreateTeamForm from "./CreateTeamForm";
 import UserList from "./UserList";
 import type { UserRowData } from "./UserRow";
 import PendingBookingsList, { type PendingBookingRow } from "./PendingBookingsList";
+import PendingAccountsList from "./PendingAccountsList";
+import OperatorScoreList, { type OperatorScoreRow } from "./OperatorScoreList";
 
 export const metadata: Metadata = {
   title: "Administração de Imagens | Safe Works",
@@ -44,23 +47,36 @@ export default async function AdminImagesPage() {
   const groups = groupSlots();
   const teams = await getAllTeams();
 
-  const [users, activeRequests, pendingBookings] = await Promise.all([
+  const [users, pendingAccounts, activeRequests, pendingBookings, allOperators] = await Promise.all([
     getAllUsers(),
+    getPendingUsers(),
     getAllActiveRequests(),
     getPendingBookings(),
+    getAllOperators(),
   ]);
   const teamNameById = new Map(teams.map((t) => [t.id, t.teamName]));
   const requestByUserId = new Map(activeRequests.map((r) => [r.userId, r]));
   const userById = new Map(users.map((u) => [u.id, u]));
-  const userRows: UserRowData[] = users.map((user) => {
-    const request = requestByUserId.get(user.id);
-    const teamLabel = request
-      ? `${teamNameById.get(request.teamId) ?? "Equipe"} · ${
-          request.status === "pending" ? "aguardando aprovação" : "membro aprovado"
-        }`
-      : "Sem equipe";
-    return { id: user.id, username: user.username, displayName: user.displayName, teamLabel };
-  });
+  // Pending accounts get their own approval queue below — showing them here
+  // too, with no team and nothing else to manage yet, would just be noise.
+  const userRows: UserRowData[] = users
+    .filter((user) => user.status !== "pending")
+    .map((user) => {
+      const request = requestByUserId.get(user.id);
+      const teamLabel = request
+        ? `${teamNameById.get(request.teamId) ?? "Equipe"} · ${
+            request.status === "pending" ? "aguardando aprovação" : "membro aprovado"
+          }`
+        : "Sem equipe";
+      return { id: user.id, username: user.username, displayName: user.displayName, teamLabel };
+    });
+  const operatorScoreRows: OperatorScoreRow[] = allOperators.map((operator) => ({
+    id: operator.id,
+    name: operator.name,
+    tag: operator.tag,
+    score: operator.score,
+    teamName: operator.teamId ? (teamNameById.get(operator.teamId) ?? null) : null,
+  }));
   const pendingBookingRows: PendingBookingRow[] = pendingBookings.map((booking) => {
     const user = userById.get(booking.userId);
     return {
@@ -130,6 +146,21 @@ export default async function AdminImagesPage() {
         <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
           <p className="eyebrow">Contas de usuário</p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
+            Solicitações de conta
+          </h2>
+          <p className="mt-2 text-sm text-ink-soft max-w-2xl">
+            Todo cadastro novo em /conta/cadastro fica pendente até você
+            aprovar. A pessoa só consegue entrar depois disso.
+          </p>
+
+          <div className="mt-6">
+            <PendingAccountsList users={pendingAccounts} />
+          </div>
+        </section>
+
+        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+          <p className="eyebrow">Contas de usuário</p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
             Acessos individuais
           </h2>
           <p className="mt-2 text-sm text-ink-soft max-w-2xl">
@@ -141,6 +172,22 @@ export default async function AdminImagesPage() {
 
           <div className="mt-6">
             <UserList users={userRows} />
+          </div>
+        </section>
+
+        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+          <p className="eyebrow">Operadores</p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
+            Graduação dos operadores
+          </h2>
+          <p className="mt-2 text-sm text-ink-soft max-w-2xl">
+            Nota de 0 a 1000 exibida no perfil de cada operador. Os critérios
+            automáticos de pontuação ainda vão ser definidos — por enquanto é
+            você quem define o número.
+          </p>
+
+          <div className="mt-6">
+            <OperatorScoreList operators={operatorScoreRows} />
           </div>
         </section>
 

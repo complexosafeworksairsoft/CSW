@@ -13,7 +13,6 @@ const LINKS = [
   { href: "/loja", label: "Loja" },
   { href: "/treinamentos", label: "Treinamentos Táticos" },
   { href: "/regras", label: "Central de Regras" },
-  { href: "/operadores", label: "Operadores" },
   { href: "/contato", label: "Contato" },
 ];
 

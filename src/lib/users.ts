@@ -8,6 +8,13 @@
 // password with bcrypt from the start — real people reusing real passwords
 // changes the risk calculus enough that this isn't deferrable the way the
 // team-shared login's TODO is.
+//
+// Every account starts 'pending': registering does NOT log the person in —
+// an admin has to approve the account first (see
+// src/app/equipes/admin/account-actions.ts). This is a separate approval
+// step from team membership (src/lib/membership.ts): account approval is
+// "can this person use the site at all", team membership is "does this
+// person belong to this specific team".
 
 import bcrypt from "bcryptjs";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -24,10 +31,14 @@ function db(): SupabaseClient {
 const BCRYPT_ROUNDS = 10;
 const USERNAME_PATTERN = /^[a-z0-9_.-]{3,32}$/;
 
+export type UserStatus = "pending" | "approved" | "rejected";
+
 export type User = {
   id: string;
   username: string;
   displayName: string;
+  status: UserStatus;
+  createdAt: number; // epoch ms
 };
 
 type UserRow = {
@@ -35,16 +46,31 @@ type UserRow = {
   username: string;
   password_hash: string;
   display_name: string;
+  status: UserStatus;
+  created_at: string;
 };
 
 function rowToUser(row: UserRow): User {
-  return { id: row.id, username: row.username, displayName: row.display_name };
+  return {
+    id: row.id,
+    username: row.username,
+    displayName: row.display_name,
+    status: row.status,
+    createdAt: new Date(row.created_at).getTime(),
+  };
 }
 
 function generateId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+/**
+ * Looks up a user by credentials regardless of approval status — the caller
+ * (src/app/conta/actions.ts's loginAction) is what decides what message to
+ * show for a 'pending'/'rejected' account vs granting a session for
+ * 'approved'. Keeping the password check independent of status here means a
+ * wrong password always fails the same way, whatever the account's status.
+ */
 export async function findUserByCredentials(
   username: string,
   password: string
@@ -86,6 +112,27 @@ export async function getAllUsers(): Promise<User[]> {
   return data.map(rowToUser);
 }
 
+/** Accounts awaiting admin approval, oldest first — the admin's "Solicitações de conta" queue. */
+export async function getPendingUsers(): Promise<User[]> {
+  const { data, error } = await db()
+    .from("users")
+    .select("*")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true })
+    .returns<UserRow[]>();
+
+  if (error || !data) return [];
+  return data.map(rowToUser);
+}
+
+export async function approveUserAccount(userId: string): Promise<void> {
+  await db().from("users").update({ status: "approved" }).eq("id", userId).eq("status", "pending");
+}
+
+export async function rejectUserAccount(userId: string): Promise<void> {
+  await db().from("users").update({ status: "rejected" }).eq("id", userId).eq("status", "pending");
+}
+
 /**
  * Deletes an account (admin-only). Any operator row linked to this user
  * (see supabase/schema.sql's `operators.user_id ... on delete set null`)
@@ -124,7 +171,7 @@ export type CreateUserInput = {
   displayName: string;
 };
 
-/** Creates a new individual user account. Usernames are unique case-insensitively (normalized to lowercase). */
+/** Creates a new individual user account, status 'pending' — needs admin approval (see getPendingUsers/approveUserAccount) before it can log in. Usernames are unique case-insensitively (normalized to lowercase). */
 export async function createUser(
   input: CreateUserInput
 ): Promise<{ ok: true; user: User } | { ok: false; error: string }> {
@@ -155,16 +202,20 @@ export async function createUser(
   }
 
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
-  const user: User = { id: generateId("u"), username, displayName: displayName.slice(0, 80) };
+  const id = generateId("u");
   const { error } = await db().from("users").insert({
-    id: user.id,
-    username: user.username,
+    id,
+    username,
     password_hash: passwordHash,
-    display_name: user.displayName,
+    display_name: displayName.slice(0, 80),
+    status: "pending",
   });
 
   if (error) {
     return { ok: false, error: "Não foi possível criar a conta. Tente novamente." };
   }
-  return { ok: true, user };
+  return {
+    ok: true,
+    user: { id, username, displayName: displayName.slice(0, 80), status: "pending", createdAt: Date.now() },
+  };
 }

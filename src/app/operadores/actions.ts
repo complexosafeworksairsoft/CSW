@@ -38,9 +38,11 @@ async function findPublicOperator(operatorId: string) {
   return publicOperators.find((o) => o.id === operatorId) ?? null;
 }
 
-/** Revalidates both the "Destaques" directory page and the operator's team roster page. */
-async function revalidateOperatorPages(teamId: string): Promise<void> {
+/** Revalidates the "Destaques" directory page, the operator's own page, and — if they have one — their team's page. */
+async function revalidateOperatorPages(operatorId: string, teamId: string | null): Promise<void> {
   revalidatePath(OPERADORES_PATH);
+  revalidatePath(`/operadores/${operatorId}`);
+  if (!teamId) return;
   const team = await findTeamById(teamId);
   if (team) {
     revalidatePath(`/operadores/equipe/${team.teamCode}`);
@@ -57,7 +59,7 @@ export async function reactAction(formData: FormData): Promise<void> {
   }
 
   await addReaction(operator.id, kindRaw);
-  await revalidateOperatorPages(operator.teamId);
+  await revalidateOperatorPages(operator.id, operator.teamId);
 }
 
 const COMMENT_TEXT_MAX = 100;
@@ -92,6 +94,6 @@ export async function addCommentAction(
   const authorName = isAdmin ? "Allis" : null;
 
   await addComment(operator.id, text, authorName);
-  await revalidateOperatorPages(operator.teamId);
+  await revalidateOperatorPages(operator.id, operator.teamId);
   return { error: null, resetToken: prevState.resetToken + 1 };
 }

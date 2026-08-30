@@ -1,12 +1,27 @@
 "use client";
 
 import { useActionState } from "react";
-import { registerAction, type AuthState } from "../actions";
+import { registerAction, type RegisterState } from "../actions";
 
-const initialState: AuthState = { error: null };
+const initialState: RegisterState = { error: null, submitted: false };
 
 export default function RegisterForm() {
   const [state, formAction, pending] = useActionState(registerAction, initialState);
+
+  if (state.submitted) {
+    return (
+      <div className="space-y-3 text-center">
+        <p className="font-mono-safe text-xs uppercase tracking-widest text-accent">
+          Cadastro enviado
+        </p>
+        <p className="text-sm text-ink">
+          Sua conta foi criada e está aguardando aprovação da administração
+          do Complexo. Você recebe acesso assim que ela for revisada — tente
+          entrar em /conta/login depois de um tempo.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form action={formAction} className="mt-8 space-y-5">

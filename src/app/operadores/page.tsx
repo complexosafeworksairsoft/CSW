@@ -13,8 +13,7 @@ import { getReactionCounts } from "@/lib/engagement-data";
 
 export const metadata: Metadata = {
   title: "Operadores | Safe Works",
-  description:
-    "Operadores públicos das equipes cadastradas no Complexo Safe Works: nome, TAG e a equipe de cada um.",
+  description: "Operadores em destaque das equipes cadastradas no Complexo Safe Works.",
 };
 
 const DESTAQUES_LIMIT = 5;
@@ -27,7 +26,7 @@ export default async function OperadoresPage() {
   const destaques = await Promise.all(
     recentPublicOperators.map(async (operator) => ({
       operator,
-      team: await findTeamById(operator.teamId),
+      team: operator.teamId ? await findTeamById(operator.teamId) : null,
       counts: await getReactionCounts(operator.id),
     }))
   );
@@ -49,7 +48,7 @@ export default async function OperadoresPage() {
       <Hero
         eyebrow="Operadores"
         title="Quem joga pelas equipes do Complexo"
-        subtitle="Perfis públicos cadastrados pelas próprias equipes: nome, TAG e a equipe de cada operador. Só aparece aqui quem a equipe decidiu tornar público."
+        subtitle="Perfis cadastrados pelas próprias equipes: nome, TAG e a equipe de cada operador. Só aparece aqui quem a equipe decidiu deixar em destaque."
       />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -58,7 +57,7 @@ export default async function OperadoresPage() {
           Atualizados recentemente
         </h2>
         <p className="mt-3 max-w-2xl text-ink-soft">
-          Os últimos operadores públicos com novidade no perfil — inclusão, troca de
+          Os últimos operadores em destaque com novidade no perfil — inclusão, troca de
           equipamento ou mudança de visibilidade.
         </p>
 
@@ -72,15 +71,17 @@ export default async function OperadoresPage() {
                 <span className="absolute -top-3 left-4 bg-accent px-2 py-0.5 font-mono-safe text-[10px] uppercase tracking-widest text-[#231400] font-semibold">
                   Destaque
                 </span>
-                <PhotoTile
-                  photo={operator.photo}
-                  fit={operator.photoFit}
-                  label={`Foto: ${operator.name}`}
-                  className="mb-3"
-                />
-                <h3 className="font-display text-base font-semibold text-ink truncate">
-                  {operator.name}
-                </h3>
+                <Link href={`/operadores/${operator.id}`}>
+                  <PhotoTile
+                    photo={operator.photo}
+                    fit={operator.photoFit}
+                    label={`Foto: ${operator.name}`}
+                    className="mb-3"
+                  />
+                  <h3 className="font-display text-base font-semibold text-ink truncate hover:text-accent transition-colors">
+                    {operator.name}
+                  </h3>
+                </Link>
                 <p className="font-mono-safe text-xs uppercase tracking-widest text-accent">
                   {operator.tag}
                 </p>
@@ -98,7 +99,7 @@ export default async function OperadoresPage() {
           </div>
         ) : (
           <p className="mt-8 text-sm text-ink-soft">
-            Nenhum operador público cadastrado até o momento.
+            Nenhum operador em destaque no momento.
           </p>
         )}
       </section>
@@ -107,11 +108,11 @@ export default async function OperadoresPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <p className="eyebrow">Equipes</p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-ink">
-            Equipes com operadores públicos
+            Equipes com operadores em destaque
           </h2>
           <p className="mt-3 max-w-2xl text-ink-soft">
             Cada equipe decide quais operadores aparecem aqui. Escolha uma equipe para
-            ver o elenco completo que ela tornou público.
+            ver o elenco completo que ela colocou em destaque.
           </p>
 
           {teams.length > 0 ? (
@@ -132,17 +133,17 @@ export default async function OperadoresPage() {
                     {team.teamName}
                   </h3>
                   <span className="mt-2 block font-mono-safe text-xs uppercase tracking-widest text-muted">
-                    {publicCount} {publicCount === 1 ? "operador público" : "operadores públicos"}
+                    {publicCount} {publicCount === 1 ? "operador em destaque" : "operadores em destaque"}
                   </span>
                   <span className="mt-4 inline-block text-sm font-medium text-olive-deep group-hover:text-accent">
-                    Ver operadores →
+                    Ver equipe →
                   </span>
                 </Link>
               ))}
             </div>
           ) : (
             <p className="mt-8 text-sm text-ink-soft">
-              Nenhuma equipe com operadores públicos até o momento.
+              Nenhuma equipe com operadores em destaque no momento.
             </p>
           )}
         </div>

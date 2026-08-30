@@ -81,10 +81,10 @@ export default function AddOperatorForm() {
               />
               <span>
                 <span className="block font-mono-safe text-xs uppercase tracking-widest text-ink-soft">
-                  Tornar operador público
+                  Deixar operador em destaque
                 </span>
                 <span className="mt-1 block text-xs text-muted">
-                  Operadores públicos aparecem na página &quot;Operadores&quot; do site, com foto, nome, TAG e equipe.
+                  Aparece na página da equipe, com foto, nome e TAG, e ganha uma página própria com foto, graduação e comentários.
                 </span>
               </span>
             </label>

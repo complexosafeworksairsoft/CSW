@@ -41,7 +41,8 @@ export type TeamProfile = {
 
 export type Operator = {
   id: string;
-  teamId: string;
+  teamId: string | null; // null: aprovado como operador mas ainda sem equipe
+  userId: string | null; // null: cadastrado à mão pela equipe, sem conta vinculada
   photo: string | null;
   photoFit: Fit;
   name: string;
@@ -49,8 +50,11 @@ export type Operator = {
   startMonth: string; // "AAAA-MM"
   category: string;
   isPublic: boolean; // shows on the public /operadores page when true
+  score: number; // 0-1000 graduação — admin-set for now, see MAX_SCORE
   updatedAt: number; // epoch ms — see touchOperator() for what bumps this
 };
+
+export const MAX_SCORE = 1000;
 
 export type Equipment = {
   id: string;
@@ -72,7 +76,8 @@ type TeamProfileRow = {
 
 type OperatorRow = {
   id: string;
-  team_id: string;
+  team_id: string | null;
+  user_id: string | null;
   photo: string | null;
   photo_fit: Fit;
   name: string;
@@ -80,6 +85,7 @@ type OperatorRow = {
   start_month: string;
   category: string;
   is_public: boolean;
+  score: number;
   updated_at: string;
 };
 
@@ -107,6 +113,7 @@ function rowToOperator(row: OperatorRow): Operator {
   return {
     id: row.id,
     teamId: row.team_id,
+    userId: row.user_id,
     photo: row.photo,
     photoFit: row.photo_fit,
     name: row.name,
@@ -114,6 +121,7 @@ function rowToOperator(row: OperatorRow): Operator {
     startMonth: row.start_month,
     category: row.category,
     isPublic: row.is_public,
+    score: row.score,
     updatedAt: new Date(row.updated_at).getTime(),
   };
 }
@@ -196,12 +204,73 @@ export async function getOperators(teamId: string): Promise<Operator[]> {
   return data.map(rowToOperator);
 }
 
+/** Every operator across every team (and team-less ones) — the admin's "Graduação" list. */
+export async function getAllOperators(): Promise<Operator[]> {
+  const { data, error } = await db()
+    .from("operators")
+    .select("*")
+    .order("name", { ascending: true })
+    .returns<OperatorRow[]>();
+
+  if (error || !data) return [];
+  return data.map(rowToOperator);
+}
+
 /** The operator row linked to an approved individual user account (see src/lib/membership.ts), or null if the user has none. */
 export async function getOperatorByUserId(userId: string): Promise<Operator | null> {
   const { data, error } = await db()
     .from("operators")
     .select("*")
     .eq("user_id", userId)
+    .maybeSingle<OperatorRow>();
+
+  if (error || !data) return null;
+  return rowToOperator(data);
+}
+
+/**
+ * Creates the operator record for a newly-approved account (see
+ * src/app/equipes/admin/account-actions.ts) — team_id starts null, since
+ * approving an account and joining a team are separate steps (see
+ * src/lib/membership.ts's approveRequest, which sets team_id on this same
+ * row later rather than creating a second one).
+ */
+export async function createOperatorForApprovedUser(
+  userId: string,
+  name: string,
+  tag: string
+): Promise<Operator | null> {
+  const id = generateId("op");
+  const nowIso = new Date().toISOString();
+  const { data, error } = await db()
+    .from("operators")
+    .insert({
+      id,
+      team_id: null,
+      user_id: userId,
+      photo: null,
+      photo_fit: "cover",
+      name: name.slice(0, 120),
+      tag: tag.slice(0, 40),
+      start_month: "",
+      category: "",
+      is_public: false,
+      score: 0,
+      updated_at: nowIso,
+    })
+    .select("*")
+    .maybeSingle<OperatorRow>();
+
+  if (error || !data) return null;
+  return rowToOperator(data);
+}
+
+/** Looks up an operator by id with no team scoping — for the public per-operator page (src/app/operadores/[operatorId]/page.tsx), which doesn't know the team code up front. Callers must check `isPublic` themselves before showing anything. */
+export async function getOperatorById(operatorId: string): Promise<Operator | null> {
+  const { data, error } = await db()
+    .from("operators")
+    .select("*")
+    .eq("id", operatorId)
     .maybeSingle<OperatorRow>();
 
   if (error || !data) return null;
@@ -275,6 +344,43 @@ export async function addOperator(
   return { ok: true, operator: rowToOperator(data) };
 }
 
+/**
+ * Moves an existing operator (one that already has an account but no team —
+ * see createOperatorForApprovedUser) into a team, called from
+ * src/lib/membership.ts's approveRequest. Unlike addOperator, this never
+ * creates a new row — the operator already exists from account approval.
+ */
+export async function assignOperatorToTeam(
+  operatorId: string,
+  teamId: string,
+  name?: string
+): Promise<{ ok: true; operator: Operator } | { ok: false; error: string }> {
+  const { count } = await db()
+    .from("operators")
+    .select("*", { count: "exact", head: true })
+    .eq("team_id", teamId);
+
+  if ((count ?? 0) >= MAX_OPERATORS_PER_TEAM) {
+    return { ok: false, error: `Limite de ${MAX_OPERATORS_PER_TEAM} operadores atingido.` };
+  }
+
+  const { data, error } = await db()
+    .from("operators")
+    .update({
+      team_id: teamId,
+      ...(name ? { name: name.slice(0, 120) } : {}),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", operatorId)
+    .select("*")
+    .maybeSingle<OperatorRow>();
+
+  if (error || !data) {
+    return { ok: false, error: "Não foi possível vincular o operador à equipe." };
+  }
+  return { ok: true, operator: rowToOperator(data) };
+}
+
 export type UpdateOperatorInput = {
   photo?: string | null;
   photoFit?: Fit; // only written when `photo` is also present — see below
@@ -339,6 +445,20 @@ async function touchOperator(operatorId: string): Promise<void> {
 }
 
 /** Flips (or explicitly sets) an operator's public/private flag, scoped to the team. */
+/** Admin-only: sets an operator's graduação (0-1000). Not team-scoped — this is the site admin's call, not the team's. Clamped defensively even though the DB column already has a check constraint. */
+export async function setOperatorScore(operatorId: string, score: number): Promise<Operator | null> {
+  const clamped = Math.max(0, Math.min(MAX_SCORE, Math.round(score)));
+  const { data, error } = await db()
+    .from("operators")
+    .update({ score: clamped })
+    .eq("id", operatorId)
+    .select("*")
+    .maybeSingle<OperatorRow>();
+
+  if (error || !data) return null;
+  return rowToOperator(data);
+}
+
 export async function setOperatorPublic(
   teamId: string,
   operatorId: string,
@@ -457,6 +577,7 @@ export async function getTeamsWithPublicOperators(): Promise<
   const publicOperators = await getPublicOperators();
   const counts = new Map<string, number>();
   for (const operator of publicOperators) {
+    if (!operator.teamId) continue; // público mas ainda sem equipe — não entra em nenhuma contagem de equipe
     counts.set(operator.teamId, (counts.get(operator.teamId) ?? 0) + 1);
   }
   return Array.from(counts.entries()).map(([teamId, publicCount]) => ({ teamId, publicCount }));

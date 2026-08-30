@@ -5,13 +5,15 @@
 // existing shared portal login — no new "captain" role in this pass, any
 // holder of the team's login can decide.
 //
-// Approving a request creates the person's `operators` row (or reuses the
-// approval flow's own insert) and links it to their user_id, so from then on
-// their individual account and their roster entry are the same person.
+// The operator row already exists by the time a request is approved (it's
+// created when the ACCOUNT is approved, see
+// src/app/equipes/admin/account-actions.ts — a team is just a grouping of
+// operators, not what makes someone an operator). Approving here only
+// assigns that existing operator to the team.
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
-import { addOperator } from "./roster-data";
+import { assignOperatorToTeam, getOperatorByUserId } from "./roster-data";
 import { findUserById } from "./users";
 
 function db(): SupabaseClient {
@@ -126,10 +128,10 @@ export async function getPendingRequestsForTeam(teamId: string): Promise<Members
 
 /**
  * Approves a pending request, scoped to the reviewing team (a team can never
- * approve another team's request): creates the operator row for that person
- * and links it to their user account. New operators start private
- * (isPublic: false) — the team can toggle that from the Ficha, same as any
- * operator they add by hand.
+ * approve another team's request): assigns the person's existing operator
+ * record (created at account-approval time) to this team. If they typed a
+ * name in their request, that becomes the operator's name; otherwise it
+ * keeps whatever name the operator record already has.
  */
 export async function approveRequest(
   teamId: string,
@@ -152,21 +154,20 @@ export async function approveRequest(
     return { ok: false, error: "Usuário não encontrado." };
   }
 
-  const operatorName = request.requested_operator_name?.trim() || user.displayName;
-  const result = await addOperator(teamId, {
-    photo: null,
-    name: operatorName,
-    tag: user.username.toUpperCase().slice(0, 40),
-    startMonth: "",
-    category: "",
-    isPublic: false,
-  });
+  const operator = await getOperatorByUserId(user.id);
+  if (!operator) {
+    return { ok: false, error: "Operador não encontrado para esta conta." };
+  }
 
+  const result = await assignOperatorToTeam(
+    operator.id,
+    teamId,
+    request.requested_operator_name?.trim() || undefined
+  );
   if (!result.ok) {
     return { ok: false, error: result.error };
   }
 
-  await db().from("operators").update({ user_id: user.id }).eq("id", result.operator.id);
   await db()
     .from("team_membership_requests")
     .update({ status: "approved", reviewed_at: new Date().toISOString() })
