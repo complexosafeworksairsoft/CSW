@@ -88,6 +88,16 @@ export function isKnownSiteImageSlot(key: string): boolean {
   return SLOT_KEYS.has(key);
 }
 
+/** URL-safe anchor id for a SITE_IMAGE_SLOTS group name (e.g. "Central de Regras" -> "central-de-regras"), used to jump to that group's section in /equipes/admin. */
+export function groupSlug(group: string): string {
+  return group
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 /** Returns the saved photo (data URI) for a slot, or null if none was uploaded yet. Doesn't carry `fit` — use getSiteImageWithFit where the crop mode matters (anywhere a photo is actually displayed on a page). */
 export async function getSiteImage(key: string): Promise<string | null> {
   const { data, error } = await db()

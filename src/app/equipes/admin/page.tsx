@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { readAdminSession } from "@/lib/admin-session";
-import { getSiteImageWithFit, SITE_IMAGE_SLOTS } from "@/lib/site-images";
+import { getSiteImageWithFit, groupSlug, SITE_IMAGE_SLOTS } from "@/lib/site-images";
 import { getAllTeams } from "@/lib/teams";
 import { getAllUsers, getPendingUsers } from "@/lib/users";
 import { getAllActiveRequests } from "@/lib/membership";
@@ -9,7 +9,6 @@ import { getPendingBookings } from "@/lib/field-bookings";
 import { getAllOperators } from "@/lib/roster-data";
 import { getAllSafetyInfo } from "@/lib/safety-info";
 import { logoutAdminAction } from "../admin-actions";
-import AdminSlotCard from "./AdminSlotCard";
 import TeamList from "./TeamList";
 import CreateTeamForm from "./CreateTeamForm";
 import UserList from "./UserList";
@@ -17,6 +16,18 @@ import type { UserRowData } from "./UserRow";
 import PendingBookingsList, { type PendingBookingRow } from "./PendingBookingsList";
 import PendingAccountsList from "./PendingAccountsList";
 import OperatorScoreList, { type OperatorScoreRow } from "./OperatorScoreList";
+import ImageSlotBrowser, { type ImageGroupData } from "./ImageSlotBrowser";
+
+// Anchors for the sticky quick-nav bar. Order mirrors the sections as they
+// appear on the page, so jumping down the list top-to-bottom matches
+// scrolling down the page top-to-bottom.
+const MANAGEMENT_NAV_ITEMS = [
+  { id: "equipes", label: "Equipes" },
+  { id: "solicitacoes", label: "Solicitações" },
+  { id: "contas", label: "Contas" },
+  { id: "operadores", label: "Operadores" },
+  { id: "agendamentos", label: "Agendamentos" },
+];
 
 export const metadata: Metadata = {
   title: "Administração de Imagens | Safe Works",
@@ -104,6 +115,11 @@ export default async function AdminImagesPage() {
     SITE_IMAGE_SLOTS.map(async (slot) => [slot.key, await getSiteImageWithFit(slot.key)] as const)
   );
   const photosBySlotKey = new Map(photoEntries);
+  const imageGroups: ImageGroupData[] = groups.map(([group, slots]) => ({
+    group,
+    slots: slots.map((slot) => ({ slot, photo: photosBySlotKey.get(slot.key) ?? null })),
+  }));
+  const imageNavItems = groups.map(([group]) => ({ id: `img-${groupSlug(group)}`, label: group }));
 
   return (
     <div>
@@ -127,6 +143,36 @@ export default async function AdminImagesPage() {
         </div>
       </div>
 
+      {/* Sticky quick-nav: jump straight to a management section or an
+          image group instead of scrolling past everything above it. Sits
+          right under the site-wide header (sticky top-0 in Nav.tsx). */}
+      <nav
+        aria-label="Navegação rápida do painel"
+        className="sticky top-14 sm:top-16 z-30 border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2.5 flex gap-1.5 overflow-x-auto">
+          {MANAGEMENT_NAV_ITEMS.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className="whitespace-nowrap font-mono-safe text-xs uppercase tracking-widest border border-line-strong px-3 py-1.5 rounded-sm text-ink-soft hover:border-accent hover:text-accent transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+          <span aria-hidden className="w-px shrink-0 bg-line-strong my-1" />
+          {imageNavItems.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className="whitespace-nowrap font-mono-safe text-xs uppercase tracking-widest border border-line-strong px-3 py-1.5 rounded-sm text-ink-soft hover:border-accent hover:text-accent transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
         <p className="text-sm text-ink-soft max-w-2xl">
           Envie uma imagem para substituir cada espaço reservado do site
@@ -134,7 +180,7 @@ export default async function AdminImagesPage() {
           imagem é enviada.
         </p>
 
-        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+        <section id="equipes" className="scroll-mt-28 mt-10 border border-line bg-surface-2 p-6 sm:p-8">
           <p className="eyebrow">Equipes</p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
             Acessos de equipe
@@ -154,7 +200,7 @@ export default async function AdminImagesPage() {
           </div>
         </section>
 
-        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+        <section id="solicitacoes" className="scroll-mt-28 mt-10 border border-line bg-surface-2 p-6 sm:p-8">
           <p className="eyebrow">Contas de usuário</p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
             Solicitações de conta
@@ -169,7 +215,7 @@ export default async function AdminImagesPage() {
           </div>
         </section>
 
-        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+        <section id="contas" className="scroll-mt-28 mt-10 border border-line bg-surface-2 p-6 sm:p-8">
           <p className="eyebrow">Contas de usuário</p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
             Acessos individuais
@@ -186,7 +232,7 @@ export default async function AdminImagesPage() {
           </div>
         </section>
 
-        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+        <section id="operadores" className="scroll-mt-28 mt-10 border border-line bg-surface-2 p-6 sm:p-8">
           <p className="eyebrow">Operadores</p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
             Graduação dos operadores
@@ -202,7 +248,7 @@ export default async function AdminImagesPage() {
           </div>
         </section>
 
-        <section className="mt-10 border border-line bg-surface-2 p-6 sm:p-8">
+        <section id="agendamentos" className="scroll-mt-28 mt-10 border border-line bg-surface-2 p-6 sm:p-8">
           <p className="eyebrow">Campo de jogo</p>
           <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
             Agendamentos pendentes
@@ -218,24 +264,8 @@ export default async function AdminImagesPage() {
           </div>
         </section>
 
-        <div className="mt-12 space-y-12">
-          {groups.map(([group, slots]) => (
-            <section key={group}>
-              <p className="eyebrow">Seção</p>
-              <h2 className="mt-2 font-display text-2xl font-semibold text-ink">
-                {group}
-              </h2>
-              <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                {slots.map((slot) => (
-                  <AdminSlotCard
-                    key={slot.key}
-                    slot={slot}
-                    photo={photosBySlotKey.get(slot.key) ?? null}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+        <div className="mt-12">
+          <ImageSlotBrowser groups={imageGroups} />
         </div>
       </div>
     </div>
